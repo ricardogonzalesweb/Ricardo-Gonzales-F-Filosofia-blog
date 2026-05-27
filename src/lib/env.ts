@@ -8,11 +8,12 @@ export type AppEnv = {
 };
 
 function required(name: string): string {
-  const value = import.meta.env[name];
+  const metaEnv = (import.meta as any)?.env || {};
+  const value = metaEnv[name] ?? process.env[name];
   if (!value) {
     throw new Error(`Missing environment variable: ${name}`);
   }
-  return value;
+  return value as string;
 }
 
 export function getAppEnv(): AppEnv {
@@ -21,7 +22,8 @@ export function getAppEnv(): AppEnv {
     supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
     resendApiKey: required("RESEND_API_KEY"),
     resendFromEmail: required("RESEND_FROM_EMAIL"),
-    contactInboxEmail: import.meta.env.CONTACT_INBOX_EMAIL || required("RESEND_FROM_EMAIL"),
+    contactInboxEmail:
+      ((import.meta as any)?.env?.CONTACT_INBOX_EMAIL as string) ?? process.env.CONTACT_INBOX_EMAIL ?? required("RESEND_FROM_EMAIL"),
     siteUrl: required("SITE_URL"),
   };
 }
