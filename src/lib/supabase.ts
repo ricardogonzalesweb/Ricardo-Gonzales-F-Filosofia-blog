@@ -120,3 +120,34 @@ export async function supabaseUnsubscribeByEmail(email: string): Promise<boolean
   const rows = (await response.json()) as Array<{ id: string }>;
   return rows.length > 0;
 }
+
+export type PostComment = {
+  name: string;
+  comment: string;
+  created_at: string;
+};
+
+export async function supabaseGetApprovedComments(postSlug: string): Promise<PostComment[]> {
+  const env = getAppEnv();
+  const query = new URLSearchParams({
+    select: "name,comment,created_at",
+    post_slug: `eq.${postSlug}`,
+    approved: "eq.true",
+    order: "created_at.asc",
+  });
+
+  const response = await fetch(`${env.supabaseUrl}/rest/v1/post_comments_leads?${query.toString()}`, {
+    headers: {
+      apikey: env.supabaseServiceRoleKey,
+      Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Supabase select comments failed: ${response.status} ${text}`);
+  }
+
+  return (await response.json()) as PostComment[];
+}

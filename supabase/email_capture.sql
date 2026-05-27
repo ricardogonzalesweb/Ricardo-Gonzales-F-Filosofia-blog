@@ -39,6 +39,7 @@ create table if not exists post_comments_leads (
   email text not null,
   comment text not null,
   consent boolean not null default false,
+  approved boolean not null default false,
   source text not null default 'post-comment',
   ip_hash text,
   created_at timestamptz not null default now()
