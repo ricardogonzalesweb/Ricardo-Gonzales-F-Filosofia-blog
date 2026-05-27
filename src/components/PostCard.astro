@@ -1,0 +1,197 @@
+---
+import type { Post } from "../lib/notion";
+import { formatNotionDate } from "../lib/notion";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+
+const date = post.publishedAt
+  ? formatNotionDate(post.publishedAt, "pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+  : "";
+---
+
+<article class="card">
+  <a href={`/blog/${post.slug}`} class="card-link" tabindex="-1" aria-hidden="true">
+    {post.coverImage ? (
+      <div class="cover">
+        <img src={post.coverImage} alt={post.title} loading="lazy" />
+      </div>
+    ) : (
+      <div class="cover cover-placeholder">
+        <span class="cover-initial">{post.title[0]?.toUpperCase()}</span>
+      </div>
+    )}
+  </a>
+
+  <div class="body">
+    {post.tags.length > 0 && (
+      <div class="tags">
+        {post.tags.map((tag) => (
+          <a href={`/blog/tag/${tag.toLowerCase()}`} class="tag">{tag}</a>
+        ))}
+      </div>
+    )}
+
+    <h2 class="title">
+      <a href={`/blog/${post.slug}`}>{post.title}</a>
+    </h2>
+
+    {post.excerpt && <p class="excerpt">{post.excerpt}</p>}
+
+    <a class="read-more" href={`/blog/${post.slug}`} aria-label={`Ler mais sobre ${post.title}`}>Ler Mais...</a>
+
+    <footer class="meta">
+      <span class="author">{post.author}</span>
+      <span class="meta-separator">•</span>
+      <time datetime={post.publishedAt}>{date}</time>
+    </footer>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px var(--color-shadow);
+  }
+
+  .cover {
+    aspect-ratio: 16/9;
+    overflow: hidden;
+  }
+
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .card:hover .cover img {
+    transform: scale(1.04);
+  }
+
+  .cover-placeholder {
+    background: var(--color-placeholder-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cover-initial {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--color-placeholder-text);
+    font-family: var(--font-display);
+  }
+
+  .body {
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-subtle);
+    padding: 0.2em 0.6em;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .tag:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0;
+    font-family: var(--font-display);
+  }
+
+  .title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .title a:hover {
+    color: var(--color-accent);
+  }
+
+  .excerpt {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .meta {
+    margin-top: auto;
+    padding-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .author {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .meta-separator {
+    color: var(--color-muted);
+  }
+
+  .read-more {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-decoration: none;
+    align-self: flex-start;
+  }
+
+  .read-more:hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+  }
+</style>

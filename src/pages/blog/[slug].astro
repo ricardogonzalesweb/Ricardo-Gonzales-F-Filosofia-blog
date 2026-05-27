@@ -1,0 +1,587 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NotionRenderer from "../../components/NotionRenderer.astro";
+import { formatNotionDate, getPosts, getPostBySlug } from "../../lib/notion";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug!);
+
+if (!post) {
+  return Astro.redirect("/blog");
+}
+
+const date = post.publishedAt
+  ? formatNotionDate(post.publishedAt, "pt-BR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })
+  : "";
+
+type TocItem = { id: string; text: string; level: 2 | 3 | 4 };
+
+function slugify(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function extractTocItems(blocks: any[]): TocItem[] {
+  const items: TocItem[] = [];
+
+  for (const block of blocks) {
+    if (block.type === "heading_1" || block.type === "heading_2" || block.type === "heading_3") {
+      const rich = block[block.type]?.rich_text ?? [];
+      const text = rich.map((t: any) => t.plain_text).join(" ").trim();
+      if (text) {
+        items.push({
+          id: slugify(text) || block.id,
+          text,
+          level: block.type === "heading_1" ? 2 : block.type === "heading_2" ? 3 : 4,
+        });
+      }
+    }
+
+    if (Array.isArray(block._children) && block._children.length > 0) {
+      items.push(...extractTocItems(block._children));
+    }
+  }
+
+  return items;
+}
+
+const tocItems = extractTocItems(post.blocks);
+
+// Schema JSON-LD para melhor indexação nos buscadores
+const siteUrl = Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br";
+const canonicalUrl = Astro.request?.url
+  ? new URL(Astro.request.url, siteUrl).toString()
+  : siteUrl;
+const articleImage = post.coverImage
+  ? post.coverImage.startsWith("http")
+    ? post.coverImage
+    : `${siteUrl}${post.coverImage}`
+  : `${siteUrl}/favicon.svg`;
+
+const schemaArticle = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.excerpt,
+  image: articleImage,
+  datePublished: post.publishedAt,
+  author: {
+    "@type": "Person",
+    name: post.author,
+  },
+  url: canonicalUrl,
+};
+---
+
+<BaseLayout
+  title={post.title}
+  description={post.excerpt}
+  ogImage={post.coverImage || "/og-images/post-og.svg"}
+  schema={schemaArticle}
+>
+  <article class="post">
+    {post.coverImage && (
+      <div class="post-cover">
+        <img src={post.coverImage} alt={post.title} loading="eager" />
+      </div>
+    )}
+
+    <div class="post-container">
+      <header class="post-header">
+        {post.tags.length > 0 && (
+          <div class="post-tags">
+            {post.tags.map((tag) => (
+              <a href={`/blog/tag/${tag.toLowerCase()}`} class="tag">{tag}</a>
+            ))}
+          </div>
+        )}
+
+        <h1 class="post-title">{post.title}</h1>
+
+        {post.excerpt && <p class="post-excerpt">{post.excerpt}</p>}
+
+        <div class="post-meta">
+          <span class="post-author">{post.author}</span>
+          <span class="meta-separator">•</span>
+          <time datetime={post.publishedAt}>{date}</time>
+        </div>
+      </header>
+
+      <div class="post-content-grid">
+        {tocItems.length > 0 && (
+          <aside class="post-toc" aria-label="Sumario do artigo">
+            <h2>Neste artigo</h2>
+            <nav>
+              {tocItems.map((item) => (
+                <a href={`#${item.id}`} class={`toc-link level-${item.level}`}>{item.text}</a>
+              ))}
+            </nav>
+          </aside>
+        )}
+
+        <div class="post-body">
+          <NotionRenderer blocks={post.blocks} />
+        </div>
+      </div>
+
+      <section class="post-share" data-post-excerpt={post.excerpt}>
+        <h2>Compartilhar</h2>
+        <div class="share-buttons">
+          <a class="share-link twitter" data-network="twitter" title="Compartilhar no Twitter">Twitter</a>
+          <a class="share-link facebook" data-network="facebook" title="Compartilhar no Facebook">Facebook</a>
+          <a class="share-link linkedin" data-network="linkedin" title="Compartilhar no LinkedIn">LinkedIn</a>
+          <a class="share-link whatsapp" data-network="whatsapp" title="Compartilhar no WhatsApp">WhatsApp</a>
+          <a class="share-link email" data-network="email" title="Compartilhar por e-mail">E-mail</a>
+        </div>
+      </section>
+
+      <section class="post-comments-lead" data-post-slug={post.slug} data-post-title={post.title}>
+        <h2>Comente este artigo</h2>
+        <p>
+          Deixe sua reflexao e receba por e-mail novos conteudos relacionados a este tema.
+        </p>
+        <form id="post-comment-form" class="comment-form">
+          <input type="text" name="hp_field" autocomplete="off" tabindex="-1" class="hp-field" />
+          <div class="comment-grid">
+            <div class="comment-group">
+              <label for="comment-name">Nome</label>
+              <input id="comment-name" name="name" type="text" placeholder="Seu nome" required />
+            </div>
+            <div class="comment-group">
+              <label for="comment-email">E-mail</label>
+              <input id="comment-email" name="email" type="email" placeholder="seu@email.com" required />
+            </div>
+          </div>
+          <div class="comment-group">
+            <label for="comment-text">Comentario</label>
+            <textarea id="comment-text" name="comment" rows="5" placeholder="Escreva seu comentario..." required></textarea>
+          </div>
+          <label class="comment-consent">
+            <input type="checkbox" id="comment-consent" name="consent" required />
+            Aceito que meu e-mail seja usado para retorno e envio de conteudos relacionados.
+          </label>
+          <button type="submit" class="comment-submit">Enviar comentario</button>
+          <p id="comment-feedback" class="comment-feedback" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <footer class="post-footer">
+        <a href="/blog" class="back-link">← Voltar para artigos</a>
+      </footer>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-cover {
+    width: 100%;
+    max-height: 480px;
+    overflow: hidden;
+  }
+  .post-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post-container {
+    max-width: var(--max-prose);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .post-header {
+    padding: 3rem 0 2.4rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 2.4rem;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-subtle);
+    padding: 0.2em 0.6em;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .tag:hover { background: var(--color-accent-hover); }
+
+  .post-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+  }
+
+  .post-excerpt {
+    font-size: 1.1rem;
+    color: var(--color-muted);
+    line-height: 1.7;
+    margin: 0 0 1.2rem;
+  }
+
+  .post-meta {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .post-author {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .meta-separator {
+    color: var(--color-muted);
+  }
+
+  .post-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .post-body {
+    padding-bottom: 3rem;
+    font-size: 1.05rem;
+    min-width: 0;
+  }
+
+  .post-toc {
+    display: none;
+    position: sticky;
+    top: 6.2rem;
+    align-self: start;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    border-radius: 10px;
+    padding: 0.9rem 0.85rem;
+    max-height: calc(100vh - 7.5rem);
+    overflow: auto;
+  }
+
+  .post-toc h2 {
+    margin: 0 0 0.7rem;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+  }
+
+  .post-toc nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.32rem;
+  }
+
+  .post-toc .toc-link {
+    text-decoration: none;
+    color: var(--color-muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+
+  .post-toc .toc-link:hover {
+    color: var(--color-accent);
+  }
+
+  .post-toc .toc-link.level-3 { padding-left: 0.7rem; }
+  .post-toc .toc-link.level-4 { padding-left: 1.4rem; }
+
+  .post-share {
+    border-top: 1px solid var(--color-border);
+    padding: 1.2rem 0 1rem;
+    margin-top: 1.6rem;
+  }
+
+  .post-share h2 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    margin: 0 0 0.6rem;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .share-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .share-link:hover {
+    background: var(--color-accent-subtle);
+    color: var(--color-accent);
+  }
+
+  .post-footer {
+    border-top: 1px solid var(--color-border);
+    padding: 2rem 0 4rem;
+  }
+
+  .post-comments-lead {
+    border-top: 1px solid var(--color-border);
+    padding: 2.2rem 0 2rem;
+  }
+
+  .post-comments-lead h2 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    margin: 0 0 0.4rem;
+  }
+
+  .post-comments-lead p {
+    margin: 0 0 1.1rem;
+    color: var(--color-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .comment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .comment-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .comment-group label {
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+
+  .comment-group input,
+  .comment-group textarea {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    padding: 0.8em 0.95em;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-card);
+    color: var(--color-text);
+    outline: none;
+  }
+
+  .comment-group input:focus,
+  .comment-group textarea:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(246, 87, 0, 0.12);
+  }
+
+  .comment-consent {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    color: var(--color-muted);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .comment-submit {
+    width: fit-content;
+    border: none;
+    background: var(--color-accent);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.75rem 1.3rem;
+    cursor: pointer;
+  }
+
+  .comment-submit:hover {
+    background: #d74800;
+  }
+
+  .comment-feedback {
+    margin: 0.2rem 0 0;
+    min-height: 1.2rem;
+    font-size: 0.82rem;
+    color: var(--color-muted);
+  }
+
+  .hp-field {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .back-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .comment-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .post-container {
+      max-width: 1220px;
+    }
+
+    .post-content-grid {
+      grid-template-columns: 260px minmax(0, 1fr);
+      align-items: start;
+      gap: 2.4rem;
+    }
+
+    .post-toc {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+  const wrapper = document.querySelector(".post-comments-lead") as HTMLElement | null;
+  const form = document.getElementById("post-comment-form") as HTMLFormElement | null;
+  const feedback = document.getElementById("comment-feedback") as HTMLElement | null;
+  const submitButton = form?.querySelector(".comment-submit") as HTMLButtonElement | null;
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!form || !wrapper || !submitButton) return;
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Enviando...";
+    if (feedback) feedback.textContent = "";
+
+    const payload = {
+      post_slug: wrapper.dataset.postSlug || "",
+      post_title: wrapper.dataset.postTitle || "",
+      name: (form.querySelector("#comment-name") as HTMLInputElement)?.value ?? "",
+      email: (form.querySelector("#comment-email") as HTMLInputElement)?.value ?? "",
+      comment: (form.querySelector("#comment-text") as HTMLTextAreaElement)?.value ?? "",
+      consent: (form.querySelector("#comment-consent") as HTMLInputElement)?.checked ?? false,
+      hp_field: (form.querySelector("input[name='hp_field']") as HTMLInputElement)?.value ?? "",
+    };
+
+    try {
+      const response = await fetch("/api/post-comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Falha ao enviar comentario.");
+      }
+
+      submitButton.textContent = "Comentario enviado!";
+      submitButton.style.background = "#16a34a";
+      if (feedback) feedback.textContent = "Obrigado! Seu comentario foi recebido.";
+      form.reset();
+    } catch (error) {
+      submitButton.textContent = "Tentar novamente";
+      submitButton.style.background = "#dc2626";
+      if (feedback) feedback.textContent = "Nao foi possivel enviar agora. Tente de novo em instantes.";
+    } finally {
+      setTimeout(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = "Enviar comentario";
+        submitButton.style.background = "";
+      }, 2200);
+    }
+  });
+
+  // Preenche links de compartilhamento usando a URL atual
+  (function () {
+    const shareLinks = document.querySelectorAll(".share-link");
+    if (!shareLinks || shareLinks.length === 0) return;
+
+    const pageUrl = location.href;
+    const title = (document.querySelector('.post-title')?.textContent || document.title).trim();
+    const excerpt = ((document.querySelector('.post-share') as HTMLElement)?.dataset.postExcerpt || '').trim();
+    const u = encodeURIComponent(pageUrl);
+    const t = encodeURIComponent(title);
+    const d = encodeURIComponent(excerpt);
+
+    shareLinks.forEach((a) => {
+      const net = (a as HTMLElement).dataset.network;
+      let href = '#';
+      switch (net) {
+        case 'twitter':
+          href = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+          break;
+        case 'facebook':
+          href = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
+          break;
+        case 'linkedin':
+          href = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
+          break;
+        case 'whatsapp':
+          href = `https://api.whatsapp.com/send?text=${t}%0A%0A${d}%0A%0A${u}`;
+          break;
+        case 'email':
+          href = `mailto:?subject=${t}&body=${t}%0A%0A${d}%0A%0A${u}`;
+          break;
+      }
+      a.setAttribute('href', href);
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+    });
+  })();
+</script>

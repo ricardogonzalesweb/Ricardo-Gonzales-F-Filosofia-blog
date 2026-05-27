@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PostCard from "../../../components/PostCard.astro";
+import { getAllTags, getPostsByTag } from "../../../lib/notion";
+
+export async function getStaticPaths() {
+  const tags = await getAllTags();
+  return tags.map((tag) => ({
+    params: { tag: tag.toLowerCase() },
+    props: { tagLabel: tag },
+  }));
+}
+
+const { tag } = Astro.params;
+const { tagLabel } = Astro.props;
+const posts = await getPostsByTag(tagLabel);
+const allTags = await getAllTags();
+---
+
+<BaseLayout
+  title={`Tag: ${tagLabel}`}
+  description={`Artigos sobre ${tagLabel}.`}
+  ogImage="/og-images/post-og.svg"
+>
+  <div class="container">
+    <header class="page-header">
+      <a href="/blog" class="back">← Todos os artigos</a>
+      <h1 class="page-title">
+        <span class="tag-pill">{tagLabel}</span>
+      </h1>
+      <p class="page-sub">{posts.length} artigo{posts.length !== 1 ? "s" : ""}</p>
+    </header>
+
+    <div class="tag-filter">
+      <a href="/blog" class="tag-btn">Todos</a>
+      {allTags.map((t) => (
+        <a
+          href={`/blog/tag/${t.toLowerCase()}`}
+          class={`tag-btn ${t.toLowerCase() === tag ? "active" : ""}`}
+        >{t}</a>
+      ))}
+    </div>
+
+    {posts.length > 0 ? (
+      <div class="posts-grid">
+        {posts.map((post) => <PostCard post={post} />)}
+      </div>
+    ) : (
+      <p class="empty">Nenhum artigo com esta tag ainda.</p>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+  .page-header { padding: 4rem 0 2rem; }
+  .back { font-size: 0.85rem; color: var(--color-muted); text-decoration: none; display: inline-block; margin-bottom: 1.2rem; }
+  .back:hover { color: var(--color-accent); }
+  .page-title { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.6rem; }
+  .tag-pill { background: var(--color-accent); color: #fff; padding: 0.1em 0.5em; border-radius: 6px; }
+  .page-sub { color: var(--color-muted); margin: 0; }
+  .tag-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.4rem; }
+  .tag-btn { font-size: 0.82rem; font-weight: 600; padding: 0.35em 0.9em; border-radius: 99px; border: 1px solid var(--color-border); text-decoration: none; color: var(--color-muted); transition: all 0.15s; }
+  .tag-btn:hover, .tag-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+  .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.6rem; padding-bottom: 4rem; }
+  .empty { color: var(--color-muted); padding: 4rem 0; text-align: center; }
+</style>

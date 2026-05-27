@@ -1,0 +1,395 @@
+---
+// Componente de Pop-up de Intenção de Saída
+---
+
+<div id="exit-popup" class="exit-popup-backdrop" role="dialog" aria-modal="true" aria-labelledby="popup-title" aria-describedby="popup-desc">
+  <div class="exit-popup-container">
+    <!-- Efeitos de Brilho de Fundo -->
+    <div class="popup-glow"></div>
+    <span class="popup-cross" style="top: 12%; left: 8%;">+</span>
+    <span class="popup-cross" style="top: 75%; right: 10%;">+</span>
+
+    <!-- Botão de Fechar Rápido (X) -->
+    <button id="popup-close-x" class="popup-close-x" aria-label="Fechar pop-up">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="popup-content">
+      <!-- Ícone Espiritual com animação sutil -->
+      <div class="popup-icon-wrapper">
+        <span class="popup-emoji">🙏</span>
+        <div class="pulse-ring"></div>
+      </div>
+
+      <span class="popup-badge">APOIE ESTE APOSTOLADO</span>
+      
+      <h3 id="popup-title" class="popup-title">
+        Sua leitura te ajudou <span class="accent">hoje?</span>
+      </h3>
+      
+      <p id="popup-desc" class="popup-desc">
+        Este trabalho de Fé Católica e Filosofia Cristã é mantido exclusivamente por leitores como você. Considere fazer uma pequena contribuição para manter nosso site no ar e apoiar a criação de novos artigos semanais.
+      </p>
+
+      <div class="popup-actions">
+        <a href="/doacoes" class="btn-popup-cta">
+          Quero Apoiar ❤️
+        </a>
+        <button id="popup-close-btn" class="btn-popup-dismiss">
+          Continuar Lendo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ── Backdrop / Overlay ──────────────────────── */
+  .exit-popup-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(14, 13, 12, 0.65); /* Escuro translúcido */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10000; /* Acima do header e busca */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .exit-popup-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ── Popup Card Container ────────────────────── */
+  .exit-popup-container {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 30px 60px var(--color-shadow), 0 0 100px rgba(246, 87, 0, 0.05);
+    border-radius: 24px;
+    padding: 2.5rem 2rem 2rem;
+    overflow: hidden;
+    transform: scale(0.92) translateY(10px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  }
+
+  .exit-popup-backdrop.active .exit-popup-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  /* ── Background Effects ──────────────────────── */
+  .popup-glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -40%);
+    width: 250px;
+    height: 200px;
+    background: radial-gradient(ellipse at center, rgba(246, 87, 0, 0.15) 0%, rgba(246, 87, 0, 0.03) 50%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .popup-cross {
+    position: absolute;
+    color: rgba(246, 87, 0, 0.25);
+    font-size: 0.85rem;
+    font-weight: 300;
+    pointer-events: none;
+    z-index: 1;
+    animation: popup-cross-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes popup-cross-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+  }
+
+  /* ── Close (X) Button ────────────────────────── */
+  .popup-close-x {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    transition: all 0.2s ease;
+  }
+
+  .popup-close-x:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-subtle);
+    border-color: rgba(246, 87, 0, 0.25);
+    transform: scale(1.05);
+  }
+
+  .popup-close-x svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ── Layout and Typography ───────────────────── */
+  .popup-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .popup-icon-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    background: var(--color-accent-subtle);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .popup-emoji {
+    font-size: 2rem;
+    line-height: 1;
+    z-index: 2;
+    animation: heart-bounce 3s infinite ease-in-out;
+  }
+
+  @keyframes heart-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-4px) scale(1.05); }
+  }
+
+  .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: ring-pulse 2s infinite cubic-bezier(0.215, 0.610, 0.355, 1);
+  }
+
+  @keyframes ring-pulse {
+    0% { transform: scale(0.9); opacity: 0.4; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  .popup-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    background: rgba(246, 87, 0, 0.08);
+    border: 1px solid rgba(246, 87, 0, 0.2);
+    padding: 0.35em 1em;
+    border-radius: 50px;
+    margin-bottom: 1rem;
+  }
+
+  .popup-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    margin: 0 0 0.75rem;
+  }
+
+  .accent {
+    color: var(--color-accent);
+  }
+
+  .popup-desc {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+    margin: 0 0 1.75rem;
+    max-width: 380px;
+  }
+
+  /* ── Action Buttons ──────────────────────────── */
+  .popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .btn-popup-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    background: var(--color-accent);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(246, 87, 0, 0.25);
+  }
+
+  .btn-popup-cta:hover {
+    background: #d74800;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(246, 87, 0, 0.35);
+  }
+
+  .btn-popup-cta:active {
+    transform: translateY(0);
+  }
+
+  .btn-popup-dismiss {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--color-muted);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-popup-dismiss:hover {
+    color: var(--color-text);
+    background: var(--color-accent-subtle);
+  }
+
+  /* ── Mobile Optimization ──────────────────────── */
+  @media (max-width: 480px) {
+    .exit-popup-container {
+      padding: 2.25rem 1.5rem 1.5rem;
+      border-radius: 20px;
+    }
+    
+    .popup-title {
+      font-size: 1.35rem;
+    }
+
+    .popup-desc {
+      font-size: 0.85rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("exit-popup");
+    const closeX = document.getElementById("popup-close-x");
+    const closeBtn = document.getElementById("popup-close-btn");
+    const ctaBtn = popup?.querySelector(".btn-popup-cta");
+
+    if (!popup) return;
+
+    // 1. Verificar se o usuário já está na página de doações
+    const isDonationPage = window.location.pathname.includes("/doacoes");
+    if (isDonationPage) return;
+
+    // 2. Verificar o limite de exibição de 24 horas via localStorage
+    const POPUP_STORAGE_KEY = "exit_popup_dismissed_at";
+    const dismissedAt = localStorage.getItem(POPUP_STORAGE_KEY);
+    if (dismissedAt) {
+      const hoursPassed = (Date.now() - parseInt(dismissedAt, 10)) / (1000 * 60 * 60);
+      if (hoursPassed < 24) {
+        return; // Retorna e não adiciona os listeners de saída se tiver sido visto recentemente
+      }
+    }
+
+    let popupShown = false;
+    let timeOnPage = 0;
+    const minTimeRequired = 8000; // 8 segundos de engajamento mínimo
+
+    // Timer para contabilizar o tempo na página
+    const timer = setInterval(() => {
+      timeOnPage += 1000;
+      if (timeOnPage >= minTimeRequired) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    // Função para mostrar o Pop-up
+    function showPopup() {
+      if (popupShown) return;
+      popupShown = true;
+      popup?.classList.add("active");
+      
+      // Registrar exibição imediata no localStorage para evitar pular nas próximas páginas
+      localStorage.setItem(POPUP_STORAGE_KEY, Date.now().toString());
+    }
+
+    // Função para fechar o Pop-up
+    function closePopup() {
+      popup?.classList.remove("active");
+    }
+
+    // 3. Capturar a intenção de saída (Mouse saindo pelo topo da página)
+    document.addEventListener("mouseleave", (e) => {
+      // Dispara se o mouse sair do topo da janela (e.clientY próximo de 0) e após o tempo mínimo
+      if (e.clientY < 15 && timeOnPage >= minTimeRequired) {
+        showPopup();
+      }
+    });
+
+    // 4. Listeners para eventos de fechamento
+    closeX?.addEventListener("click", closePopup);
+    closeBtn?.addEventListener("click", closePopup);
+    
+    // Fechar ao clicar no CTA (vai abrir a página de doações, mas fecha o modal)
+    ctaBtn?.addEventListener("click", closePopup);
+
+    // Fechar ao clicar no background translúcido
+    popup.addEventListener("click", (e) => {
+      if (e.target === popup) {
+        closePopup();
+      }
+    });
+
+    // Fechar ao pressionar a tecla Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && popup.classList.contains("active")) {
+        closePopup();
+      }
+    });
+  });
+</script>

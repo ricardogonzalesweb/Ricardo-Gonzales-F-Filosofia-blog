@@ -1,0 +1,1511 @@
+---
+import { SEO } from "astro-seo";
+import ExitIntentPopup from "../components/ExitIntentPopup.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string | null;
+  schema?: Record<string, any>;
+}
+
+const {
+  title = "Ricardo Gonzales Fé & Filosofia",
+  description = "Reflexões sobre Fé Católica e Filosofia. Novos artigos toda semana.",
+  ogImage,
+  schema,
+} = Astro.props;
+
+const siteName = "Ricardo Gonzales Fé & Filosofia";
+const siteTitle = title.includes("Ricardo Gonzales")
+  ? title
+  : `${title} | ${siteName}`;
+
+const siteUrl = Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br";
+const canonicalUrl = Astro.request?.url
+  ? new URL(Astro.request.url, siteUrl).toString()
+  : siteUrl;
+const fullImage = ogImage
+  ? ogImage.startsWith("http")
+    ? ogImage
+    : `${siteUrl}${ogImage}`
+  : `${siteUrl}/favicon.svg`;
+const currentPath = Astro.url.pathname.replace(/\/$/, "");
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <!-- Google Tag Manager -->
+    <script type="text/partytown" is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NGQM4HC6');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <SEO
+      title={siteTitle}
+      description={description}
+      canonical={canonicalUrl}
+      openGraph={{
+        basic: {
+          title: siteTitle,
+          type: "website",
+          image: fullImage,
+          url: canonicalUrl,
+        },
+        image: {
+          alt: description,
+        },
+        optional: {
+          siteName,
+        },
+      }}
+      twitter={{
+        site: "@ricardogonzales",
+        card: "summary_large_image",
+      }}
+    />
+    {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NGQM4HC6"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <header class="site-header">
+      <div class="container">
+        <a href="/" class="logo">
+          <img src="/favicon.svg" alt="Logo" class="logo-icon" />
+          <span class="logo-text-full">
+            Ricardo Gonzales <span class="logo-subtext">Fé &amp; Filosofia</span>
+          </span>
+        </a>
+
+        <button
+          class="header-icon-btn mobile-theme-toggle"
+          id="theme-toggle-mobile"
+          data-theme-toggle
+          aria-label="Alternar tema"
+          title="Alternar tema escuro/claro"
+        >
+          <svg
+            class="theme-icon theme-icon--light"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg
+            class="theme-icon theme-icon--dark"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </button>
+
+        <button
+          class="mobile-menu-btn"
+          id="mobile-menu-btn"
+          aria-label="Menu"
+          title="Abrir menu"
+        >
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+
+        <div class="header-nav-wrap" id="header-nav-wrap">
+          <nav>
+            <a href="/" class={currentPath === "" ? "nav-active" : ""}>Home</a>
+            <a href="/blog" class={currentPath.startsWith("/blog") ? "nav-active" : ""}>Blog</a>
+            <a href="/sobre" class={currentPath.startsWith("/sobre") ? "nav-active" : ""}>Sobre</a>
+            <a href="/contato" class={currentPath.startsWith("/contato") ? "nav-active" : ""}>Contato</a>
+          </nav>
+
+          <div class="header-actions">
+            <button
+              class="header-icon-btn"
+              id="search-toggle"
+              aria-label="Buscar"
+              title="Buscar"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+
+            <button
+              class="header-icon-btn desktop-theme-toggle"
+              id="theme-toggle"
+              data-theme-toggle
+              aria-label="Alternar tema"
+              title="Alternar tema escuro/claro"
+            >
+              <svg
+                class="theme-icon theme-icon--light"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg
+                class="theme-icon theme-icon--dark"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+              </svg>
+            </button>
+
+            <a href="/newsletter" class="btn-newsletter">Newsletter</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Search Modal ─────────────────────────── -->
+    <div id="search-modal" class="search-modal" role="dialog" aria-modal="true" aria-label="Buscar artigos">
+      <div class="search-backdrop" id="search-backdrop"></div>
+      <div class="search-box">
+        <div class="search-input-wrap">
+          <svg class="search-icon-inner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Buscar artigos..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="search-close" class="search-close-btn" aria-label="Fechar busca">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div id="search-results" class="search-results"></div>
+        <div class="search-footer">
+          <span>↑↓ navegar</span>
+          <span>↵ abrir</span>
+          <span>Esc fechar</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="site-main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <a href="/" class="footer-logo">
+              <img src="/favicon.svg" alt="Logo" class="logo-icon" />
+              Ricardo Gonzales Fé &amp; Filosofia
+            </a>
+            <p class="footer-desc">
+              Ideias, reflexões e artigos sobre a Fé Católica e a Filosofia.
+            </p>
+          </div>
+
+          <div class="footer-col">
+            <h4 class="footer-col-title">NAVEGAÇÃO</h4>
+            <ul class="footer-links">
+              <li><a href="/">Home</a></li>
+              <li><a href="/blog">Blog</a></li>
+              <li><a href="/sobre">Sobre</a></li>
+              <li><a href="/contato">Contato</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4 class="footer-col-title">CONTEÚDO</h4>
+            <ul class="footer-links">
+              <li><a href="/blog">Artigos</a></li>
+              <li><a href="https://links.ricardogonzalesoficial.com.br/" target="_blank" rel="noopener noreferrer">Links</a></li>
+              <li><a href="/doacoes">Doações</a></li>
+              <li><a href="https://links.ricardogonzalesoficial.com.br/liturgia-diaria" target="_blank" rel="noopener noreferrer">Liturgia Diária</a></li>
+              <li><a href="http://ebook.ricardogonzalesoficial.com.br/" target="_blank" rel="noopener noreferrer">E-book Gratuito</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4 class="footer-col-title">REDES SOCIAIS</h4>
+            <div class="footer-socials">
+              <a
+                href="https://www.facebook.com/ricardogonzalesoficial/"
+                aria-label="Facebook"
+                class="social-icon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                  ></path>
+                </svg>
+              </a>
+              <a
+                href="https://www.instagram.com/ricardogonzalesoficial/"
+                aria-label="Instagram"
+                class="social-icon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
+                  ></path>
+                </svg>
+              </a>
+              <a
+                href="https://www.youtube.com/@ricardogonzalesoficial"
+                aria-label="YouTube"
+                class="social-icon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                  ></path>
+                </svg>
+              </a>
+              <a
+                href="https://www.tiktok.com/@ricardogonzalesoficial"
+                aria-label="TikTok"
+                class="social-icon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+                  ></path>
+                </svg>
+              </a>
+              <a
+                href="https://discord.com/invite/hftJhYQBxE"
+                aria-label="Discord"
+                class="social-icon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"
+                  ></path>
+                </svg>
+              </a>
+              <a
+                href="https://whatsapp.com/channel/0029VbB43pfAjPXMWpyOks1h"
+                aria-label="WhatsApp"
+                class="social-icon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+            <a href="/newsletter" class="btn-newsletter footer-newsletter"
+              >Newsletter</a
+            >
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div class="footer-legal">
+            <span class="footer-legal-title">CONTEÚDO LEGAL</span>
+            <a href="/privacidade">Política de Privacidade</a>
+            <a href="/termos">Termos de Uso</a>
+          </div>
+          <div class="footer-copyright">
+            <p>
+              ©2026 Ricardo Gonzales Fé &amp; Filosofia. Todos os direitos
+              reservados.
+            </p>
+          </div>
+          <div class="footer-credit">
+            <p>Desenvolvido com ❤️ Para a Glória de Deus</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <style is:global>
+      /* ── Design tokens ─────────────────────────── */
+      :root {
+        --font-display: "Sora", system-ui, sans-serif;
+        --font-body: "Inter", system-ui, sans-serif;
+
+        --color-bg: #f5f0ea;
+        --color-card: #fcf8f3;
+        --color-text: #1a1a18;
+        --color-muted: #6b6b68;
+        --color-border: rgba(0, 0, 0, 0.1);
+        --color-shadow: rgba(0, 0, 0, 0.08);
+        --color-accent: #f65700;
+        --color-accent-subtle: rgba(246, 87, 0, 0.12);
+        --color-accent-hover: rgba(246, 87, 0, 0.2);
+        --color-code-bg: #f4f3ff;
+        --color-callout-bg: #f8f7ff;
+        --color-placeholder-bg: linear-gradient(135deg, #f5d2c0, #f7d1bd);
+        --color-placeholder-text: #f65700;
+        --scrollbar-track: #f1e7df;
+        --scrollbar-thumb: #f65700;
+        --scrollbar-thumb-hover: #d74800;
+
+        --max-w: 1100px;
+        --max-prose: 720px;
+      }
+
+      [data-theme="dark"] {
+        --color-bg: #0e0d0c;
+        --color-card: #13110f;
+        --color-text: #f0ede8;
+        --color-muted: #9a9997;
+        --color-border: rgba(255, 255, 255, 0.08);
+        --color-shadow: rgba(0, 0, 0, 0.4);
+        --color-accent: #f65700;
+        --color-accent-subtle: rgba(246, 87, 0, 0.12);
+        --color-accent-hover: rgba(246, 87, 0, 0.2);
+        --color-code-bg: #1e1c2e;
+        --color-callout-bg: #1a1828;
+        --color-placeholder-bg: linear-gradient(135deg, #3b1002, #1b0b04);
+        --color-placeholder-text: #f65700;
+        --scrollbar-track: #1b1918;
+        --scrollbar-thumb: #f65700;
+        --scrollbar-thumb-hover: #d74800;
+      }
+
+      /* ── Reset ─────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        font-family: var(--font-body);
+        background: var(--color-bg);
+        color: var(--color-text);
+        margin: 0;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        transition: background 0.2s, color 0.2s;
+        line-height: 1.6;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      }
+
+      *::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+
+      *::-webkit-scrollbar-track {
+        background: var(--scrollbar-track);
+      }
+
+      *::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-thumb);
+        border-radius: 999px;
+        border: 3px solid var(--scrollbar-track);
+      }
+
+      *::-webkit-scrollbar-thumb:hover {
+        background: var(--scrollbar-thumb-hover);
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      a {
+        color: inherit;
+        transition: color 0.2s ease;
+      }
+
+      a:hover {
+        color: var(--color-accent);
+      }
+
+      /* ── Container ─────────────────────────────── */
+      .container {
+        width: 100%;
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid var(--color-border);
+        background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: background 0.2s ease, backdrop-filter 0.2s ease;
+      }
+
+      .site-header.menu-open {
+        background: var(--color-bg);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      .site-header .container {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        letter-spacing: -0.01em;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
+      .logo-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        object-fit: contain;
+      }
+
+      .logo-text-full {
+        display: inline;
+        max-width: 32ch;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .logo-subtext {
+        font-weight: 500;
+        opacity: 0.8;
+        margin-left: 0.25rem;
+      }
+
+      /* ── Mobile menu button ──────────────────── */
+      .mobile-menu-btn {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 38px;
+        height: 38px;
+        padding: 8px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        margin-left: auto;
+        flex-shrink: 0;
+        z-index: 110;
+      }
+
+      .hamburger-line {
+        display: block;
+        width: 100%;
+        height: 2px;
+        background: var(--color-text);
+        border-radius: 2px;
+        transition: transform 0.3s, opacity 0.3s;
+      }
+
+      .mobile-menu-btn.active .hamburger-line:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .mobile-menu-btn.active .hamburger-line:nth-child(2) {
+        opacity: 0;
+      }
+      .mobile-menu-btn.active .hamburger-line:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      /* ── Header nav wrapper ──────────────────── */
+      .header-nav-wrap {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex: 1;
+      }
+
+      .site-header nav {
+        display: flex;
+        gap: 0.4rem;
+        flex: 1;
+        margin-left: 0.5rem;
+      }
+
+      .site-header nav a {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--color-muted);
+        text-decoration: none;
+        transition: color 0.15s, background 0.15s;
+        padding: 0.35em 0.85em;
+        border-radius: 6px;
+      }
+
+      .site-header nav a:hover {
+        color: var(--color-text);
+      }
+
+      .site-header nav a.nav-active {
+        background: var(--color-accent-subtle);
+        color: var(--color-accent);
+        font-weight: 600;
+        border: 1px solid rgba(246, 87, 0, 0.25);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+
+      .header-icon-btn {
+        background: transparent;
+        border: none;
+        border-radius: 10px;
+        padding: 0.5em;
+        width: 38px;
+        height: 38px;
+        cursor: pointer;
+        color: var(--color-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s, background 0.2s, transform 0.2s;
+        flex-shrink: 0;
+      }
+
+      .mobile-theme-toggle {
+        display: none;
+      }
+
+      .header-icon-btn:hover {
+        color: var(--color-accent);
+        background: var(--color-accent-subtle);
+        transform: translateY(-1px);
+      }
+
+      .header-icon-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .header-icon-btn .theme-icon--dark {
+        display: none;
+      }
+
+      [data-theme="dark"] .header-icon-btn .theme-icon--light {
+        display: none;
+      }
+
+      [data-theme="dark"] .header-icon-btn .theme-icon--dark {
+        display: inline;
+      }
+
+      .btn-newsletter {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5em 1.2em;
+        background: var(--color-accent);
+        color: #fff;
+        font-family: var(--font-body);
+        font-size: 0.82rem;
+        font-weight: 600;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        white-space: nowrap;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-newsletter:hover {
+        background: #d74800;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(246, 87, 0, 0.35);
+      }
+
+      /* ── Main ──────────────────────────────────── */
+      .site-main {
+        flex: 1;
+      }
+
+      /* ── Footer ────────────────────────────────── */
+      .site-footer {
+        background: #1a1714;
+        color: #f0ede8;
+        padding: 0;
+        margin-top: 4rem;
+        border-top: none;
+      }
+
+      .footer-top {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+        gap: 2.5rem;
+        padding: 3.5rem 0 3rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .footer-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        color: #f0ede8;
+        white-space: nowrap;
+      }
+
+      .footer-logo:hover {
+        color: var(--color-accent);
+      }
+
+      .footer-desc {
+        font-size: 0.82rem;
+        color: #9a9997;
+        line-height: 1.6;
+        margin: 0;
+        max-width: 260px;
+      }
+
+      .footer-col-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #9a9997;
+        margin: 0 0 1.2rem;
+      }
+
+      .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      .footer-links a {
+        font-size: 0.85rem;
+        color: #c5c3bf;
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+
+      .footer-links a:hover {
+        color: var(--color-accent);
+      }
+
+      .footer-socials {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .social-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #c5c3bf;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s, transform 0.2s,
+          border-color 0.2s;
+      }
+
+      .social-icon:hover {
+        background: var(--color-accent-subtle);
+        color: var(--color-accent);
+        border-color: rgba(246, 87, 0, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .social-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .footer-newsletter {
+        margin-top: 0.2rem;
+      }
+
+      .footer-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.2rem 0;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .footer-legal {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .footer-legal-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #9a9997;
+      }
+
+      .footer-legal a {
+        font-size: 0.78rem;
+        color: #9a9997;
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+
+      .footer-legal a:hover {
+        color: var(--color-accent);
+      }
+
+      .footer-copyright p,
+      .footer-credit p {
+        font-size: 0.78rem;
+        color: #6b6b68;
+        margin: 0;
+        text-align: center;
+      }
+
+      .footer-credit p {
+        color: #9a9997;
+      }
+
+      /* ── Utilities ─────────────────────────────── */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      /* ── Responsive: Tablet ────────────────────── */
+      @media (max-width: 768px) {
+        /* Show hamburger, hide desktop nav */
+        .mobile-menu-btn {
+          display: flex;
+          margin-left: 0;
+        }
+
+        .mobile-theme-toggle {
+          display: inline-flex;
+          margin-left: auto;
+        }
+
+        .logo-subtext {
+          display: block;
+          margin-left: 0;
+          margin-top: 0.1rem;
+          font-size: 0.78rem;
+          line-height: 1.1;
+          opacity: 0.85;
+        }
+
+        .logo-text-full {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: flex-start;
+          max-width: none;
+          font-size: 0.9rem;
+          line-height: 1.1;
+        }
+
+        .header-nav-wrap {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: var(--color-bg);
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          padding: 80px 1.5rem 1.5rem;
+          overflow-y: auto;
+          z-index: 99;
+        }
+
+        .header-nav-wrap.open {
+          display: flex;
+        }
+
+        .site-header nav {
+          flex-direction: column;
+          gap: 0.3rem;
+          margin-left: 0;
+          flex: 0 0 auto;
+        }
+
+        .site-header nav a {
+          font-size: 1rem;
+          padding: 0.8em 1em;
+          border-radius: 10px;
+        }
+
+        .header-actions {
+          margin-left: 0;
+          margin-top: 0.35rem;
+          padding-top: 0.35rem;
+          border-top: 1px solid var(--color-border);
+          justify-content: flex-start;
+          gap: 0.5rem;
+        }
+
+        .header-actions .header-icon-btn {
+          width: 36px;
+          height: 36px;
+        }
+
+        .desktop-theme-toggle {
+          display: none;
+        }
+
+        .header-actions .btn-newsletter {
+          display: inline-flex;
+          flex: 0 0 auto;
+          justify-content: center;
+          padding: 0.7em 1.2em;
+          font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer-top {
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .footer-legal {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+      }
+
+      /* ── Responsive: Small phone ───────────────── */
+      @media (max-width: 480px) {
+        .footer-top {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .footer-bottom {
+          gap: 0.6rem;
+        }
+
+        .footer-legal {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+    /* ── Search Modal ──────────────────────────── */
+    .search-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 8vh;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .search-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .search-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .search-box {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 600px;
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(246,87,0,0.15);
+      overflow: hidden;
+      transform: translateY(-16px) scale(0.97);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin: 0 1rem;
+    }
+
+    .search-modal.open .search-box {
+      transform: translateY(0) scale(1);
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--color-border, rgba(255,255,255,0.1));
+    }
+
+    .search-icon-inner {
+      width: 20px;
+      height: 20px;
+      color: var(--color-muted, #a09880);
+      flex-shrink: 0;
+    }
+
+    #search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 1.05rem;
+      color: var(--color-text, #f0ede8);
+      caret-color: var(--color-accent, #f65700);
+    }
+
+    #search-input::placeholder {
+      color: var(--color-muted, #a09880);
+    }
+
+    .search-close-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--color-muted, #a09880);
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .search-close-btn:hover {
+      color: var(--color-text, #f0ede8);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .search-close-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-results {
+      max-height: 420px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .search-results::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .search-results::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .search-results::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+
+    .search-empty {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--color-muted, #a09880);
+      font-size: 0.95rem;
+    }
+
+    .search-empty .search-empty-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .search-result-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.875rem;
+      padding: 0.875rem 0.75rem;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--color-text, #f0ede8);
+      transition: background 0.15s;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .search-result-item:hover,
+    .search-result-item.active {
+      background: rgba(246, 87, 0, 0.08);
+      border-color: rgba(246, 87, 0, 0.2);
+    }
+
+    .search-result-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(246, 87, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    .search-result-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .search-result-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-result-title mark {
+      background: transparent;
+      color: var(--color-accent, #f65700);
+      font-weight: 700;
+    }
+
+    .search-result-meta {
+      font-size: 0.78rem;
+      color: var(--color-muted, #a09880);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-result-arrow {
+      color: var(--color-muted, #a09880);
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .search-result-item:hover .search-result-arrow,
+    .search-result-item.active .search-result-arrow {
+      opacity: 1;
+      color: var(--color-accent, #f65700);
+    }
+
+    .search-footer {
+      display: flex;
+      gap: 1.25rem;
+      padding: 0.625rem 1.25rem;
+      border-top: 1px solid var(--color-border, rgba(255,255,255,0.1));
+      font-size: 0.72rem;
+      color: var(--color-muted, #a09880);
+    }
+
+    .search-footer span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ── Notion quote colors ────────────────── */
+    /* Text colors */
+    .notion-quote.notion-color-gray   { color: #9b9a97 !important; border-left-color: #9b9a97 !important; background: rgba(155,154,151,.08) !important; }
+    .notion-quote.notion-color-brown  { color: #64473a !important; border-left-color: #64473a !important; background: rgba(100,71,58,.08)  !important; }
+    .notion-quote.notion-color-orange { color: #d9730d !important; border-left-color: #d9730d !important; background: rgba(217,115,13,.08) !important; }
+    .notion-quote.notion-color-yellow { color: #cb912f !important; border-left-color: #cb912f !important; background: rgba(203,145,47,.08) !important; }
+    .notion-quote.notion-color-green  { color: #448361 !important; border-left-color: #448361 !important; background: rgba(68,131,97,.08)  !important; }
+    .notion-quote.notion-color-blue   { color: #337ea9 !important; border-left-color: #337ea9 !important; background: rgba(51,126,169,.08) !important; }
+    .notion-quote.notion-color-purple { color: #9065b0 !important; border-left-color: #9065b0 !important; background: rgba(144,101,176,.08) !important; }
+    .notion-quote.notion-color-pink   { color: #c14d8a !important; border-left-color: #c14d8a !important; background: rgba(193,77,138,.08) !important; }
+    .notion-quote.notion-color-red    { color: #d44c47 !important; border-left-color: #d44c47 !important; background: rgba(212,76,71,.08)  !important; }
+
+    /* Background colors — light mode */
+    .notion-quote.notion-color-gray_background   { background: #f1f1ef !important; border-left-color: #9b9a97 !important; }
+    .notion-quote.notion-color-brown_background  { background: #f4eeee !important; border-left-color: #64473a !important; }
+    .notion-quote.notion-color-orange_background { background: #fbecdd !important; border-left-color: #d9730d !important; }
+    .notion-quote.notion-color-yellow_background { background: #fbf3db !important; border-left-color: #cb912f !important; }
+    .notion-quote.notion-color-green_background  { background: #edf3ec !important; border-left-color: #448361 !important; }
+    .notion-quote.notion-color-blue_background   { background: #e7f3f8 !important; border-left-color: #337ea9 !important; }
+    .notion-quote.notion-color-purple_background { background: #f4f0f7 !important; border-left-color: #9065b0 !important; }
+    .notion-quote.notion-color-pink_background   { background: #f9eff4 !important; border-left-color: #c14d8a !important; }
+    .notion-quote.notion-color-red_background    { background: #fdebec !important; border-left-color: #d44c47 !important; }
+
+    /* Background colors — dark mode */
+    [data-theme="dark"] .notion-quote.notion-color-gray_background   { background: rgba(155,154,151,.15) !important; }
+    [data-theme="dark"] .notion-quote.notion-color-brown_background  { background: rgba(100,71,58,.25)   !important; }
+    [data-theme="dark"] .notion-quote.notion-color-orange_background { background: rgba(217,115,13,.15) !important; }
+    [data-theme="dark"] .notion-quote.notion-color-yellow_background { background: rgba(203,145,47,.15) !important; }
+    [data-theme="dark"] .notion-quote.notion-color-green_background  { background: rgba(68,131,97,.15)  !important; }
+    [data-theme="dark"] .notion-quote.notion-color-blue_background   { background: rgba(51,126,169,.15) !important; }
+    [data-theme="dark"] .notion-quote.notion-color-purple_background { background: rgba(144,101,176,.15) !important; }
+    [data-theme="dark"] .notion-quote.notion-color-pink_background   { background: rgba(193,77,138,.15) !important; }
+    [data-theme="dark"] .notion-quote.notion-color-red_background    { background: rgba(212,76,71,.15)  !important; }
+
+    /* Dark mode text color adjustments (lighter tones for readability) */
+    [data-theme="dark"] .notion-quote.notion-color-brown  { color: #c1957a !important; }
+    [data-theme="dark"] .notion-quote.notion-color-green  { color: #6db890 !important; }
+
+    </style>
+
+    <script>
+      // Theme toggle
+      const toggles = document.querySelectorAll("[data-theme-toggle]");
+      const html = document.documentElement;
+
+      const stored = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      if (stored === "dark" || (!stored && prefersDark)) {
+        html.setAttribute("data-theme", "dark");
+      }
+
+      toggles.forEach((toggleEl) => {
+        toggleEl.addEventListener("click", () => {
+          const isDark = html.getAttribute("data-theme") === "dark";
+          html.setAttribute("data-theme", isDark ? "light" : "dark");
+          localStorage.setItem("theme", isDark ? "light" : "dark");
+        });
+      });
+
+      // Mobile menu toggle
+      const menuBtn = document.getElementById("mobile-menu-btn");
+      const navWrap = document.getElementById("header-nav-wrap");
+
+      menuBtn?.addEventListener("click", () => {
+        menuBtn.classList.toggle("active");
+        navWrap?.classList.toggle("open");
+        
+        const header = document.querySelector(".site-header");
+        header?.classList.toggle("menu-open");
+        
+        document.body.style.overflow = navWrap?.classList.contains("open")
+          ? "hidden"
+          : "";
+      });
+
+      // Close mobile menu when clicking any nav link
+      navWrap?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          menuBtn?.classList.remove("active");
+          navWrap?.classList.remove("open");
+          document.body.style.overflow = "";
+          document.querySelector(".site-header")?.classList.remove("menu-open");
+        });
+      });
+
+      // ── Search Modal ──────────────────────────────
+      const searchToggle = document.getElementById("search-toggle");
+      const searchModal = document.getElementById("search-modal");
+      const searchBackdrop = document.getElementById("search-backdrop");
+      const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
+      const searchResults = document.getElementById("search-results");
+      const searchClose = document.getElementById("search-close");
+
+      // Static blog posts — fetched once from the blog listing
+      interface PostEntry {
+        title: string;
+        slug: string;
+        tags: string[];
+        date: string;
+        emoji: string;
+      }
+
+      let allPosts: PostEntry[] = [];
+      let activeIndex = -1;
+
+      async function loadPosts() {
+        if (allPosts.length > 0) return;
+        try {
+          const res = await fetch("/blog");
+          const html = await res.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          // PostCard items — class is "card" on <article>
+          const cards = doc.querySelectorAll("article.card");
+          cards.forEach((card) => {
+            const titleEl = card.querySelector(".title a");
+            const linkEl = card.querySelector("a");
+            const timeEl = card.querySelector("time");
+            const tagEls = card.querySelectorAll(".tag");
+            const initial = card.querySelector(".cover-initial");
+            if (titleEl && linkEl) {
+              allPosts.push({
+                title: titleEl.textContent?.trim() ?? "",
+                slug: linkEl.getAttribute("href") ?? "/blog",
+                tags: Array.from(tagEls).map((t) => t.textContent?.trim() ?? ""),
+                date: timeEl?.textContent?.trim() ?? "",
+                emoji: initial?.textContent?.trim() ?? "📄",
+              });
+            }
+          });
+        } catch (e) {
+          console.warn("Não foi possível carregar posts para busca.", e);
+        }
+      }
+
+      function highlightText(text: string, query: string): string {
+        if (!query) return text;
+        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        return text.replace(
+          new RegExp(`(${escaped})`, "gi"),
+          "<mark>$1</mark>"
+        );
+      }
+
+      function renderResults(query: string) {
+        if (!searchResults) return;
+        activeIndex = -1;
+
+        if (!query.trim()) {
+          searchResults.innerHTML = `
+            <div class="search-empty">
+              <div class="search-empty-icon">🔍</div>
+              <p>Digite para buscar artigos...</p>
+            </div>`;
+          return;
+        }
+
+        const lower = query.toLowerCase();
+        const filtered = allPosts.filter(
+          (p) =>
+            p.title.toLowerCase().includes(lower) ||
+            p.tags.some((t) => t.toLowerCase().includes(lower))
+        );
+
+        if (filtered.length === 0) {
+          searchResults.innerHTML = `
+            <div class="search-empty">
+              <div class="search-empty-icon">😔</div>
+              <p>Nenhum artigo encontrado para "${query}"</p>
+            </div>`;
+          return;
+        }
+
+        searchResults.innerHTML = filtered
+          .slice(0, 8)
+          .map(
+            (p, i) => `
+            <a href="${p.slug}" class="search-result-item" data-index="${i}">
+              <div class="search-result-icon">${p.emoji}</div>
+              <div class="search-result-content">
+                <div class="search-result-title">${highlightText(p.title, query)}</div>
+                <div class="search-result-meta">
+                  ${p.date}${p.tags.length ? " · " + p.tags.slice(0, 3).join(", ") : ""}
+                </div>
+              </div>
+              <svg class="search-result-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>`
+          )
+          .join("");
+      }
+
+      function openSearch() {
+        if (navWrap?.classList.contains("open")) {
+          menuBtn?.classList.remove("active");
+          navWrap?.classList.remove("open");
+          document.querySelector(".site-header")?.classList.remove("menu-open");
+        }
+        searchModal?.classList.add("open");
+        document.body.style.overflow = "hidden";
+        setTimeout(() => searchInput?.focus(), 50);
+        renderResults("");
+        loadPosts();
+      }
+
+      function closeSearch() {
+        searchModal?.classList.remove("open");
+        document.body.style.overflow = "";
+        if (searchInput) searchInput.value = "";
+        activeIndex = -1;
+      }
+
+      searchToggle?.addEventListener("click", openSearch);
+      searchClose?.addEventListener("click", closeSearch);
+      searchBackdrop?.addEventListener("click", closeSearch);
+
+      searchInput?.addEventListener("input", () => {
+        renderResults(searchInput.value);
+      });
+
+      // Keyboard navigation
+      searchInput?.addEventListener("keydown", (e) => {
+        const items = searchResults?.querySelectorAll(".search-result-item");
+        if (!items || items.length === 0) return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          activeIndex = Math.min(activeIndex + 1, items.length - 1);
+          items.forEach((el, i) => el.classList.toggle("active", i === activeIndex));
+          (items[activeIndex] as HTMLElement).scrollIntoView({ block: "nearest" });
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          activeIndex = Math.max(activeIndex - 1, 0);
+          items.forEach((el, i) => el.classList.toggle("active", i === activeIndex));
+          (items[activeIndex] as HTMLElement).scrollIntoView({ block: "nearest" });
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          const active = searchResults?.querySelector(".search-result-item.active") as HTMLAnchorElement | null;
+          if (active) window.location.href = active.href;
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
+          if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+          e.preventDefault();
+          searchModal?.classList.contains("open") ? closeSearch() : openSearch();
+        }
+        if (e.key === "Escape" && searchModal?.classList.contains("open")) {
+          closeSearch();
+        }
+      });
+    </script>
+    <ExitIntentPopup />
+  </body>
+</html>

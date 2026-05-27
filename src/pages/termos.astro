@@ -1,0 +1,274 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Termos de Uso" description="Termos de uso do blog Ricardo Gonzales Fé & Filosofia. Leia as condições de utilização do nosso conteúdo." ogImage="/og-images/default-og.svg">
+  <section class="page-hero">
+    <div class="hero-glow"></div>
+    <div class="container hero-content">
+      <span class="page-badge">✦ LEGAL</span>
+      <h1 class="page-title">Termos de <span class="accent">Uso</span></h1>
+      <p class="page-sub">Última atualização: 22 de maio de 2026</p>
+    </div>
+  </section>
+
+  <section class="legal-section">
+    <div class="container">
+      <div class="legal-content">
+        <div class="legal-toc">
+          <h3>Índice</h3>
+          <nav>
+            <a href="#aceitacao">1. Aceitação dos Termos</a>
+            <a href="#uso">2. Uso do Conteúdo</a>
+            <a href="#propriedade">3. Propriedade Intelectual</a>
+            <a href="#conduta">4. Conduta do Usuário</a>
+            <a href="#links">5. Links Externos</a>
+            <a href="#limitacao">6. Limitação de Responsabilidade</a>
+            <a href="#modificacoes">7. Modificações</a>
+            <a href="#contato">8. Contato</a>
+          </nav>
+        </div>
+
+        <article class="legal-body">
+          <section id="aceitacao">
+            <h2>1. Aceitação dos Termos</h2>
+            <p>Ao acessar e utilizar o blog <strong>Ricardo Gonzales Fé &amp; Filosofia</strong>, você concorda em cumprir e ficar vinculado a estes Termos de Uso. Se você não concordar com qualquer parte destes termos, pedimos que não utilize nosso site.</p>
+            <p>O uso continuado do site após a publicação de alterações constitui aceitação dos termos modificados.</p>
+          </section>
+
+          <section id="uso">
+            <h2>2. Uso do Conteúdo</h2>
+            <p>Todo o conteúdo publicado neste blog, incluindo artigos, textos, imagens e mídias, é disponibilizado exclusivamente para fins educativos, informativos e de reflexão pessoal.</p>
+            <ul>
+              <li>Você pode ler, compartilhar e citar trechos dos artigos, desde que forneça a devida atribuição ao autor e ao blog.</li>
+              <li>Não é permitido reproduzir integralmente artigos sem autorização prévia por escrito.</li>
+              <li>O conteúdo não deve ser utilizado para fins comerciais sem consentimento expresso.</li>
+            </ul>
+          </section>
+
+          <section id="propriedade">
+            <h2>3. Propriedade Intelectual</h2>
+            <p>Todo o conteúdo original deste blog é protegido por direitos autorais. Os textos, layouts, logotipos e demais elementos visuais são de propriedade do autor ou utilizados com licença adequada.</p>
+            <p>Marcas registradas de terceiros mencionadas no conteúdo pertencem aos seus respectivos proprietários.</p>
+          </section>
+
+          <section id="conduta">
+            <h2>4. Conduta do Usuário</h2>
+            <p>Ao interagir com nosso conteúdo (comentários, formulários de contato, newsletter), você se compromete a:</p>
+            <ul>
+              <li>Não enviar conteúdo ofensivo, discriminatório ou que viole leis vigentes;</li>
+              <li>Não utilizar o site para distribuir spam ou material publicitário não solicitado;</li>
+              <li>Respeitar os demais leitores e contribuir para um ambiente de diálogo construtivo;</li>
+              <li>Não tentar acessar áreas restritas ou comprometer a segurança do site.</li>
+            </ul>
+          </section>
+
+          <section id="links">
+            <h2>5. Links Externos</h2>
+            <p>Este blog pode conter links para sites de terceiros. Não temos controle sobre o conteúdo, políticas de privacidade ou práticas desses sites e não nos responsabilizamos por eles.</p>
+            <p>Recomendamos que você leia os termos de uso e políticas de privacidade de qualquer site de terceiros que visite.</p>
+          </section>
+
+          <section id="limitacao">
+            <h2>6. Limitação de Responsabilidade</h2>
+            <p>O conteúdo deste blog é fornecido "como está", sem garantias de qualquer tipo, expressas ou implícitas. O autor não se responsabiliza por:</p>
+            <ul>
+              <li>Decisões tomadas com base no conteúdo publicado;</li>
+              <li>Erros, omissões ou desatualizações no conteúdo;</li>
+              <li>Indisponibilidade temporária do site;</li>
+              <li>Danos decorrentes do uso ou impossibilidade de uso do site.</li>
+            </ul>
+          </section>
+
+          <section id="modificacoes">
+            <h2>7. Modificações</h2>
+            <p>Reservamo-nos o direito de atualizar ou modificar estes Termos de Uso a qualquer momento. Alterações significativas serão comunicadas por meio do blog ou newsletter. A data da última atualização será sempre indicada no topo desta página.</p>
+          </section>
+
+          <section id="contato">
+            <h2>8. Contato</h2>
+            <p>Em caso de dúvidas sobre estes Termos de Uso, entre em contato conosco através da nossa <a href="/contato">página de contato</a>.</p>
+          </section>
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    position: relative;
+    background: #0e0d0c;
+    color: #f0ede8;
+    padding: 5rem 0 3.5rem;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(246, 87, 0, 0.12) 0%, rgba(246, 87, 0, 0.04) 40%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .page-badge {
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    background: rgba(246, 87, 0, 0.1);
+    border: 1px solid rgba(246, 87, 0, 0.25);
+    padding: 0.45em 1.2em;
+    border-radius: 50px;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .accent { color: var(--color-accent); }
+
+  .page-sub {
+    color: #9a9997;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* ── Legal Section ───────────────────────── */
+  .legal-section {
+    padding: 4rem 0;
+  }
+
+  .legal-content {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 3rem;
+    align-items: flex-start;
+  }
+
+  /* ── Table of Contents ───────────────────── */
+  .legal-toc {
+    position: sticky;
+    top: 84px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 1.4rem;
+  }
+
+  .legal-toc h3 {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    margin: 0 0 1rem;
+  }
+
+  .legal-toc nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .legal-toc nav a {
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+    line-height: 1.4;
+  }
+
+  .legal-toc nav a:hover {
+    color: var(--color-accent);
+  }
+
+  /* ── Legal Body ──────────────────────────── */
+  .legal-body {
+    max-width: var(--max-prose);
+  }
+
+  .legal-body section {
+    margin-bottom: 2.5rem;
+    scroll-margin-top: 84px;
+  }
+
+  .legal-body h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.8rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .legal-body p {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--color-muted);
+    margin: 0 0 0.8rem;
+  }
+
+  .legal-body ul {
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .legal-body li {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--color-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .legal-body li::marker {
+    color: var(--color-accent);
+  }
+
+  .legal-body a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .legal-body a:hover {
+    text-decoration: underline;
+  }
+
+  .legal-body strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .legal-content {
+      grid-template-columns: 1fr;
+    }
+
+    .legal-toc {
+      position: static;
+    }
+  }
+</style>
