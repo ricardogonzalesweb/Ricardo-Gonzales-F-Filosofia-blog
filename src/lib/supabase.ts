@@ -134,6 +134,11 @@ export async function supabaseUploadObject(
   const env = getAppEnv();
   const uploadUrl = `${env.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/${encodeURIComponent(bucket)}/${encodeURIComponent(objectPath)}`;
 
+  const bodyData = Buffer.isBuffer(data) ? new Uint8Array(data) : data;
+  const fetchBody = bodyData instanceof Uint8Array
+    ? bodyData.buffer.slice(bodyData.byteOffset, bodyData.byteOffset + bodyData.byteLength)
+    : (bodyData as any);
+
   const res = await fetch(uploadUrl, {
     method: "PUT",
     headers: {
@@ -141,7 +146,7 @@ export async function supabaseUploadObject(
       Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
       "Content-Type": contentType,
     },
-    body: data,
+    body: fetchBody,
   });
 
   if (!res.ok) {
