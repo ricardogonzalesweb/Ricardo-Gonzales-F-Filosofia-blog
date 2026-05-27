@@ -1,6 +1,7 @@
 ---
 import { SEO } from "astro-seo";
 import ExitIntentPopup from "../components/ExitIntentPopup.astro";
+import CookieConsent from "../components/CookieConsent.astro";
 
 interface Props {
   title?: string;
@@ -1507,5 +1508,6 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "");
       });
     </script>
     <ExitIntentPopup />
+    <CookieConsent />
   </body>
 </html>

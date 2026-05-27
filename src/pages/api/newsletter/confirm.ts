@@ -1,3 +1,4 @@
+export const prerender = false;
 import type { APIRoute } from "astro";
 import { sendEmail } from "../../../lib/resend";
 import { supabaseActivateSubscriber } from "../../../lib/supabase";

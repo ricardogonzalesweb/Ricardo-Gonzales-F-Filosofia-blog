@@ -1,3 +1,4 @@
+export const prerender = false;
 import type { APIRoute } from "astro";
 import { supabaseUnsubscribeByEmail } from "../../../lib/supabase";
 import { isValidEmail } from "../../../lib/validation";

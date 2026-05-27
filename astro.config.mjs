@@ -2,11 +2,13 @@
 import { defineConfig } from 'astro/config';
 import sitemap, { EnumChangefreq } from 'astro-sitemap';
 import partytown from '@astrojs/partytown';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  // Para deploy estático (Vercel, Netlify, Cloudflare Pages, etc.)
+  // Para deploy estático por padrão com APIs sob demanda na Vercel (Astro v5+)
   output: 'static',
+  adapter: vercel(),
 
   // URL do site em produção
   site: 'https://ricardogonzalesoficial.com.br',

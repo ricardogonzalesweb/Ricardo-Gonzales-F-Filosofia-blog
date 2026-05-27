@@ -1,3 +1,4 @@
+export const prerender = false;
 import type { APIRoute } from "astro";
 import { createHash } from "node:crypto";
 import { checkRateLimit, getClientIp } from "../../lib/rate-limit";

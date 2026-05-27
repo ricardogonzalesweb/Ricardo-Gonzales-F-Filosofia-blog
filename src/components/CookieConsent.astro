@@ -1,0 +1,225 @@
+---
+// Componente de Consentimento de Cookies Premium
+---
+
+<div id="cookie-consent-banner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-desc">
+  <div class="cookie-content">
+    <div class="cookie-header">
+      <div class="cookie-icon-wrapper">
+        <span class="cookie-emoji">🍪</span>
+      </div>
+      <h4 id="cookie-title" class="cookie-title">Privacidade &amp; Cookies</h4>
+    </div>
+    <p id="cookie-desc" class="cookie-desc">
+      Utilizamos cookies essenciais e analíticos para melhorar sua experiência, personalizar conteúdo e analisar o tráfego do nosso site de acordo com nossa <a href="/privacidade" class="cookie-link">Política de Privacidade</a>.
+    </p>
+    <div class="cookie-actions">
+      <button id="cookie-accept" class="btn-cookie-accept">
+        Aceitar Todos
+      </button>
+      <button id="cookie-reject" class="btn-cookie-reject">
+        Recusar
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ── Banner Container ────────────────────────── */
+  .cookie-banner {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: calc(100% - 4rem);
+    max-width: 420px;
+    background: color-mix(in srgb, var(--color-card) 92%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 20px 40px var(--color-shadow), 0 0 80px rgba(246, 87, 0, 0.03);
+    border-radius: 20px;
+    padding: 1.75rem;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    pointer-events: none;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  }
+
+  .cookie-banner.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  /* ── Layout & Content ────────────────────────── */
+  .cookie-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .cookie-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .cookie-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    background: var(--color-accent-subtle);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cookie-emoji {
+    font-size: 1.25rem;
+    animation: cookie-wiggle 4s infinite ease-in-out;
+    display: inline-block;
+  }
+
+  @keyframes cookie-wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    10% { transform: rotate(-8deg); }
+    20% { transform: rotate(8deg); }
+    30% { transform: rotate(-6deg); }
+    40% { transform: rotate(6deg); }
+    50% { transform: rotate(0deg); }
+  }
+
+  .cookie-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .cookie-desc {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  .cookie-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    font-weight: 500;
+  }
+
+  .cookie-link:hover {
+    color: var(--scrollbar-thumb-hover);
+  }
+
+  /* ── Buttons ─────────────────────────────── */
+  .cookie-actions {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .btn-cookie-accept {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-accent);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(246, 87, 0, 0.2);
+  }
+
+  .btn-cookie-accept:hover {
+    background: #d74800;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(246, 87, 0, 0.3);
+  }
+
+  .btn-cookie-accept:active {
+    transform: translateY(0);
+  }
+
+  .btn-cookie-reject {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    color: var(--color-muted);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cookie-reject:hover {
+    color: var(--color-text);
+    background: var(--color-accent-subtle);
+    border-color: rgba(246, 87, 0, 0.2);
+  }
+
+  /* ── Mobile Layout ───────────────────────────── */
+  @media (max-width: 500px) {
+    .cookie-banner {
+      bottom: 1rem;
+      right: 1rem;
+      left: 1rem;
+      width: auto;
+      max-width: none;
+      padding: 1.25rem;
+      border-radius: 16px;
+    }
+
+    .cookie-actions {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const banner = document.getElementById("cookie-consent-banner");
+    const acceptBtn = document.getElementById("cookie-accept");
+    const rejectBtn = document.getElementById("cookie-reject");
+
+    if (!banner) return;
+
+    const CONSENT_STORAGE_KEY = "cookie_consent_status";
+    const consentStatus = localStorage.getItem(CONSENT_STORAGE_KEY);
+
+    // Se o usuário não tomou decisão ainda, mostrar o banner com atraso de 1s para suavidade
+    if (!consentStatus) {
+      setTimeout(() => {
+        banner.classList.add("show");
+      }, 1000);
+    }
+
+    function saveConsent(status: "accepted" | "rejected") {
+      localStorage.setItem(CONSENT_STORAGE_KEY, status);
+      banner?.classList.remove("show");
+
+      // Disparar evento customizado se outras partes da aplicação precisarem escutar
+      window.dispatchEvent(new CustomEvent("cookie-consent-changed", { detail: { status } }));
+    }
+
+    acceptBtn?.addEventListener("click", () => saveConsent("accepted"));
+    rejectBtn?.addEventListener("click", () => saveConsent("rejected"));
+  });
+</script>
