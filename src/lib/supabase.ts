@@ -163,27 +163,49 @@ export type PostComment = {
   created_at: string;
 };
 
+function normalizeSlug(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^\/+/, "")
+    .replace(/^blog\//, "")
+    .replace(/\/+$/, "");
+}
+
 export async function supabaseGetApprovedComments(postSlug: string): Promise<PostComment[]> {
   const env = getAppEnv();
-  const query = new URLSearchParams({
-    select: "name,comment,created_at",
-    post_slug: `eq.${postSlug}`,
+  const normalized = normalizeSlug(postSlug);
+  const headers = {
+    apikey: env.supabaseServiceRoleKey,
+    Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
+    Accept: "application/json",
+  };
+
+  // 1) Schema original: aprovacao por boolean em `approved`
+  const approvedQuery = new URLSearchParams({
+    select: "name,comment,created_at,post_slug",
     approved: "eq.true",
     order: "created_at.asc",
   });
-
-  const response = await fetch(`${env.supabaseUrl}/rest/v1/post_comments_leads?${query.toString()}`, {
-    headers: {
-      apikey: env.supabaseServiceRoleKey,
-      Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Supabase select comments failed: ${response.status} ${text}`);
+  const approvedRes = await fetch(`${env.supabaseUrl}/rest/v1/post_comments_leads?${approvedQuery.toString()}`, { headers });
+  if (approvedRes.ok) {
+    const rows = (await approvedRes.json()) as Array<PostComment & { post_slug?: string }>;
+    return rows.filter((row) => normalizeSlug(row.post_slug ?? "") === normalized);
   }
 
-  return (await response.json()) as PostComment[];
+  // 2) Schema alternativo: aprovacao por texto em `status`
+  const statusQuery = new URLSearchParams({
+    select: "name,comment,created_at,post_slug",
+    or: "(status.eq.approved,status.ilike.approved,status.eq.Aprovado,status.eq.aprovado)",
+    order: "created_at.asc",
+  });
+  const statusRes = await fetch(`${env.supabaseUrl}/rest/v1/post_comments_leads?${statusQuery.toString()}`, { headers });
+  if (statusRes.ok) {
+    const rows = (await statusRes.json()) as Array<PostComment & { post_slug?: string }>;
+    return rows.filter((row) => normalizeSlug(row.post_slug ?? "") === normalized);
+  }
+
+  const errApproved = await approvedRes.text();
+  const errStatus = await statusRes.text();
+  throw new Error(`Supabase select comments failed. approved query: ${approvedRes.status} ${errApproved} | status query: ${statusRes.status} ${errStatus}`);
 }

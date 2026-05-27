@@ -2,7 +2,7 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { randomBytes } from "node:crypto";
 import { getClientIp, checkRateLimit } from "../../../lib/rate-limit";
-import { sendEmail } from "../../../lib/resend";
+import { sendEmail } from "../../../lib/brevo";
 import { supabaseUpsertSubscriber } from "../../../lib/supabase";
 import { asString, isValidEmail, jsonResponse, parseBoolean } from "../../../lib/validation";
 import { getAppEnv } from "../../../lib/env";

@@ -26,7 +26,7 @@ create table if not exists email_events (
   id uuid primary key default gen_random_uuid(),
   email text,
   event_type text not null,
-  provider text not null default 'resend',
+  provider text not null default 'brevo',
   payload jsonb,
   created_at timestamptz not null default now()
 );
@@ -40,7 +40,17 @@ create table if not exists post_comments_leads (
   comment text not null,
   consent boolean not null default false,
   approved boolean not null default false,
+  status text,
   source text not null default 'post-comment',
   ip_hash text,
   created_at timestamptz not null default now()
 );
+
+alter table if exists email_events
+  alter column provider set default 'brevo';
+
+alter table if exists post_comments_leads
+  add column if not exists approved boolean not null default false;
+
+alter table if exists post_comments_leads
+  add column if not exists status text;

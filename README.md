@@ -1,4 +1,4 @@
-# Astro + Notion Blog com Contato e Newsletter (Supabase + Resend)
+# Astro + Notion Blog com Contato e Newsletter (Supabase + Brevo)
 
 Este projeto usa **Astro** com **Notion como CMS**, além de um fluxo completo de:
 
@@ -7,7 +7,7 @@ Este projeto usa **Astro** com **Notion como CMS**, além de um fluxo completo d
 - Double opt-in (confirmação por e-mail)
 - Descadastro (unsubscribe)
 - Persistência no Supabase
-- Envio de e-mails com Resend
+- Envio de e-mails com Brevo
 - Domínio na Registro.br com DNS/e-mail via Cloudflare
 
 ## Visão geral da arquitetura
@@ -15,7 +15,7 @@ Este projeto usa **Astro** com **Notion como CMS**, além de um fluxo completo d
 1. Frontend (`/contato` e `/newsletter`) envia dados para rotas API internas.
 2. Rotas API em `src/pages/api/*` validam payload, aplicam anti-spam e rate-limit.
 3. Dados são salvos no Supabase (`contact_messages`, `newsletter_subscribers`).
-4. Resend envia e-mails transacionais (contato e confirmação de newsletter).
+4. Brevo envia e-mails transacionais (contato e confirmação de newsletter).
 5. Cloudflare Email Routing recebe/encaminha inbox do domínio (ex.: `contato@seudominio.com`).
 
 ## Requisitos
@@ -23,7 +23,7 @@ Este projeto usa **Astro** com **Notion como CMS**, além de um fluxo completo d
 - Node.js `>=22.12.0`
 - Conta no Notion
 - Conta no Supabase
-- Conta no Resend
+- Conta no Brevo
 - Domínio próprio (Registro.br)
 - Conta Cloudflare (DNS + Email Routing)
 
@@ -50,17 +50,19 @@ NOTION_TOKEN=secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 NOTION_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 SUPABASE_URL=https://YOUR-PROJECT.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
-RESEND_API_KEY=re_xxxxxxxxxxxxx
-RESEND_FROM_EMAIL=contato@seudominio.com
+BREVO_API_KEY=xkeysib-xxxxxxxxxxxxx
+BREVO_FROM_EMAIL=contato@seudominio.com
+BREVO_SENDER_NAME=Ricardo Gonzales
+BREVO_WELCOME_TEMPLATE_ID=
 CONTACT_INBOX_EMAIL=contato@seudominio.com
 SITE_URL=https://seudominio.com
 ```
 
 Observações:
 
-- `SUPABASE_SERVICE_ROLE_KEY` e `RESEND_API_KEY` são **server-side only**.
+- `SUPABASE_SERVICE_ROLE_KEY` e `BREVO_API_KEY` são **server-side only**.
 - `SITE_URL` deve ser a URL canônica do site em produção.
-- `CONTACT_INBOX_EMAIL` pode ser igual ao `RESEND_FROM_EMAIL`.
+- `CONTACT_INBOX_EMAIL` pode ser igual ao `BREVO_FROM_EMAIL`.
 
 ### 3. Configurar banco no Supabase
 
@@ -107,7 +109,7 @@ Status esperados: `Published` e `Draft`.
 
 No database: `•••` -> **Connections** -> selecione a integration.
 
-## Configuração de domínio e DNS (Registro.br + Cloudflare + Resend)
+## Configuração de domínio e DNS (Registro.br + Cloudflare + Brevo)
 
 ### 1. Registro.br -> Cloudflare
 
@@ -121,9 +123,9 @@ Configure:
 - Email Routing (MX + records auxiliares recomendados pela Cloudflare)
 - SPF/DKIM/DMARC conforme estratégia de envio
 
-### 3. Resend
+### 3. Brevo
 
-1. Adicione seu domínio em Resend.
+1. Adicione seu domínio em Brevo.
 2. Crie/verifique os registros DNS solicitados (SPF/DKIM).
 3. Aguarde status de domínio como verificado.
 
@@ -172,7 +174,7 @@ src/
   lib/
     env.ts
     rate-limit.ts
-    resend.ts
+    brevo.ts
     supabase.ts
     validation.ts
   pages/
@@ -235,7 +237,7 @@ npm run preview
 - Usar consentimento explícito para newsletter.
 - Manter política de privacidade e termos atualizados.
 - Recomenda-se adicionar CAPTCHA (Cloudflare Turnstile) em produção.
-- Configurar webhooks da Resend para eventos de bounce/complaint em `email_events`.
+- Configurar webhooks da Brevo para eventos de bounce/complaint em `email_events`.
 
 ## Troubleshooting
 
@@ -247,9 +249,9 @@ Em ambientes restritos, o Astro pode tentar escrever configuração de telemetry
 
 Verifique:
 
-- Domínio verificado no Resend
+- Domínio verificado no Brevo
 - SPF/DKIM/DMARC corretos
-- `RESEND_FROM_EMAIL` pertencente ao domínio validado
+- `BREVO_FROM_EMAIL` pertencente ao domínio validado
 - logs de erro da rota API
 
 ### APIs retornam erro em produção
@@ -258,4 +260,5 @@ Verifique:
 
 - adapter serverless configurado
 - variáveis de ambiente no provedor
-- acesso de rede do runtime para Supabase/Resend
+- acesso de rede do runtime para Supabase/Brevo
+

@@ -1,6 +1,6 @@
 export const prerender = false;
 import type { APIRoute } from "astro";
-import { sendEmail } from "../../../lib/resend";
+import { sendEmail, upsertBrevoContactToList } from "../../../lib/brevo";
 import { supabaseActivateSubscriber } from "../../../lib/supabase";
 import { getAppEnv } from "../../../lib/env";
 
@@ -21,18 +21,30 @@ export const GET: APIRoute = async ({ url, redirect }) => {
       const env = getAppEnv();
       const unsubscribeUrl = `${env.siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
       const preferencesUrl = `${env.siteUrl}/newsletter`;
+      if (env.brevoListId) {
+        await upsertBrevoContactToList(email, env.brevoListId);
+      }
 
-      await sendEmail({
-        to: email,
-        subject: "Bem-vindo(a) a newsletter",
-        template: {
-          id: "21ed651d-078e-4e06-a3ad-b489f500657c",
-          variables: {
-            unsubscribe_url: unsubscribeUrl,
-            preferences_url: preferencesUrl,
+      if (env.brevoWelcomeTemplateId) {
+        await sendEmail({
+          to: email,
+          subject: "Bem-vindo(a) a newsletter",
+          template: {
+            id: env.brevoWelcomeTemplateId,
+            variables: {
+              unsubscribe_url: unsubscribeUrl,
+              preferences_url: preferencesUrl,
+            },
           },
-        },
-      });
+        });
+      } else {
+        await sendEmail({
+          to: email,
+          subject: "Bem-vindo(a) a newsletter",
+          html: `<h2>Bem-vindo(a)!</h2><p>Sua inscricao foi confirmada com sucesso.</p><p>Obrigado por fazer parte da nossa comunidade.</p><p>Gerenciar assinatura: <a href="${preferencesUrl}">${preferencesUrl}</a></p><p>Cancelar inscricao: <a href="${unsubscribeUrl}">${unsubscribeUrl}</a></p>`,
+          text: `Bem-vindo(a)! Sua inscricao foi confirmada com sucesso. Gerenciar assinatura: ${preferencesUrl}. Cancelar inscricao: ${unsubscribeUrl}`,
+        });
+      }
     } catch (emailError) {
       // Nao bloqueia a confirmacao da newsletter em caso de falha no envio.
       console.error("Welcome email error:", emailError);
