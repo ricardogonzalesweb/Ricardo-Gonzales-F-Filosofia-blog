@@ -6,14 +6,20 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  // Para deploy estático por padrão com APIs sob demanda na Vercel (Astro v5+)
-  output: 'static',
-  adapter: vercel(),
+  // Modo servidor com ISR: páginas são renderizadas sob demanda
+  // e revalidadas automaticamente a cada 5 minutos pela Vercel
+  output: 'server',
+  adapter: vercel({
+    isr: {
+      // Revalida as páginas a cada 5 minutos (300 segundos)
+      expiration: 300,
+    },
+  }),
 
   // URL do site em produção
   site: 'https://ricardogonzalesoficial.com.br',
 
-  // Revalidação incremental: rebuild só quando necessário
+  // Formato de build
   build: {
     format: 'directory',
   },

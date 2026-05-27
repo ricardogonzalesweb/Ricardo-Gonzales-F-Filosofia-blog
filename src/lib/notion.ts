@@ -4,6 +4,9 @@ import type {
   PageObjectResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
 
 // ─── Client ────────────────────────────────────────────────────────────────
 
@@ -138,19 +141,94 @@ function getStatus(props: Record<string, any>): Post["status"] {
   return "Draft";
 }
 
-function getCoverImage(page: PageObjectResponse, props: Record<string, any>): string | null {
+// ─── Image Caching ─────────────────────────────────────────────────────────
+
+const COVERS_DIR = path.join(process.cwd(), "public", "notion-covers");
+
+/**
+ * Downloads a remote image and saves it to public/notion-covers/.
+ * Returns the local URL path (e.g. /notion-covers/abc123.jpg).
+ * If the file already exists, it skips downloading.
+ */
+async function downloadAndCacheImage(url: string): Promise<string> {
+  // Create a stable filename hash from the URL (without query params that change on each API call)
+  const urlObj = new URL(url);
+  // Use the pathname (without expiring query params) for hashing
+  const hashSource = urlObj.origin + urlObj.pathname;
+  const hash = crypto.createHash("md5").update(hashSource).digest("hex");
+
+  // Detect extension from the URL path
+  const extMatch = urlObj.pathname.match(/\.(jpe?g|png|gif|webp|avif|svg|bmp|ico)$/i);
+  const ext = extMatch ? extMatch[0].toLowerCase() : ".jpg";
+
+  const filename = `${hash}${ext}`;
+  const localPath = path.join(COVERS_DIR, filename);
+  const publicUrl = `/notion-covers/${filename}`;
+
+  // If already downloaded, skip
+  if (fs.existsSync(localPath)) {
+    return publicUrl;
+  }
+
+  // Ensure directory exists
+  fs.mkdirSync(COVERS_DIR, { recursive: true });
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.warn(`[notion] Failed to download cover image: ${response.status} ${url}`);
+      return url; // Fallback to original URL
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    fs.writeFileSync(localPath, buffer);
+    console.log(`[notion] Cached cover image: ${publicUrl}`);
+    return publicUrl;
+  } catch (error) {
+    console.warn(`[notion] Error caching cover image:`, error);
+    return url; // Fallback to original URL
+  }
+}
+
+/**
+ * Returns true if the URL is a temporary Notion/AWS-hosted file
+ * (as opposed to an external user-provided URL that won't expire).
+ */
+function isNotionHostedUrl(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname;
+    return (
+      hostname.includes("s3.us-west-2.amazonaws.com") ||
+      hostname.includes("s3.amazonaws.com") ||
+      hostname.includes("prod-files-secure") ||
+      hostname.includes("secure.notion-static.com")
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function getCoverImage(page: PageObjectResponse, props: Record<string, any>): Promise<string | null> {
+  let url: string | null = null;
+
   if (page.cover?.type === "external") {
-    return page.cover.external.url;
+    url = page.cover.external.url;
+  } else if (page.cover?.type === "file") {
+    url = page.cover.file.url;
+  } else {
+    const fileProp = props.Cover?.files ?? [];
+    const file = fileProp[0];
+    url = file?.external?.url ?? file?.file?.url ?? null;
   }
 
-  if (page.cover?.type === "file") {
-    return page.cover.file.url;
+  if (!url) return null;
+
+  // Only download & cache Notion-hosted (temporary) URLs
+  if (isNotionHostedUrl(url)) {
+    return downloadAndCacheImage(url);
   }
 
-  const fileProp = props.Cover?.files ?? [];
-  const file = fileProp[0];
-
-  return file?.external?.url ?? file?.file?.url ?? null;
+  return url;
 }
 
 function getAuthor(props: Record<string, any>, page: PageObjectResponse): string {
@@ -171,7 +249,7 @@ function getAuthor(props: Record<string, any>, page: PageObjectResponse): string
   );
 }
 
-function pageToPost(page: PageObjectResponse): Post {
+async function pageToPost(page: PageObjectResponse): Promise<Post> {
   const props = page.properties as Record<string, any>;
 
   const title = getTitle(props);
@@ -181,7 +259,7 @@ function pageToPost(page: PageObjectResponse): Post {
   const tags = getTags(props);
   const author = getAuthor(props, page);
   const status = getStatus(props);
-  const coverImage = getCoverImage(page, props);
+  const coverImage = await getCoverImage(page, props);
 
   return { id: page.id, slug, title, excerpt, coverImage, publishedAt, tags, author, status };
 }
@@ -242,11 +320,11 @@ function sortPosts(posts: Post[]): Post[] {
 export async function getPosts(): Promise<Post[]> {
   const response = await queryDataSource({ page_size: 100 });
 
-  return sortPosts(
-    (response.results as PageObjectResponse[])
-      .map(pageToPost)
-      .filter((post) => post.status === "Published")
+  const allPosts = await Promise.all(
+    (response.results as PageObjectResponse[]).map(pageToPost)
   );
+
+  return sortPosts(allPosts.filter((post) => post.status === "Published"));
 }
 
 /**
@@ -285,10 +363,13 @@ export async function getPostBySlug(
 
   if (!page) return null;
 
-  const blocks = await fetchBlocksWithChildren(page.id);
+  const [post, blocks] = await Promise.all([
+    pageToPost(page),
+    fetchBlocksWithChildren(page.id),
+  ]);
 
   return {
-    ...pageToPost(page),
+    ...post,
     blocks,
   };
 }
@@ -297,14 +378,16 @@ export async function getPostBySlug(
 export async function getPostsByTag(tag: string): Promise<Post[]> {
   const response = await queryDataSource({ page_size: 100 });
 
+  const allPosts = await Promise.all(
+    (response.results as PageObjectResponse[]).map(pageToPost)
+  );
+
   return sortPosts(
-    (response.results as PageObjectResponse[])
-      .map(pageToPost)
-      .filter(
-        (post) =>
-          post.status === "Published" &&
-          post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
-      )
+    allPosts.filter(
+      (post) =>
+        post.status === "Published" &&
+        post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
+    )
   );
 }
 

@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Vercel
 .vercel/
+
+# Cached Notion cover images (downloaded during build)
+public/notion-covers/
