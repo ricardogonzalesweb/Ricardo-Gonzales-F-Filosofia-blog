@@ -170,10 +170,12 @@ async function downloadAndCacheImage(url: string): Promise<string> {
     return publicUrl;
   }
 
-  // Ensure directory exists
-  fs.mkdirSync(COVERS_DIR, { recursive: true });
-
+  // Try to create directory and save file. On read-only filesystems (e.g. serverless),
+  // avoid throwing: fall back to returning the original remote URL so rendering continues.
   try {
+    // Ensure directory exists
+    fs.mkdirSync(COVERS_DIR, { recursive: true });
+
     const response = await fetch(url);
     if (!response.ok) {
       console.warn(`[notion] Failed to download cover image: ${response.status} ${url}`);
@@ -185,7 +187,8 @@ async function downloadAndCacheImage(url: string): Promise<string> {
     console.log(`[notion] Cached cover image: ${publicUrl}`);
     return publicUrl;
   } catch (error) {
-    console.warn(`[notion] Error caching cover image:`, error);
+    // Likely a read-only filesystem error in serverless envs (ENOENT/EPERM). Do not throw.
+    console.warn(`[notion] Could not cache cover image (falling back to remote URL):`, error?.message ?? error);
     return url; // Fallback to original URL
   }
 }
