@@ -7,6 +7,7 @@ import type {
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { supabaseUploadObject } from "./supabase";
 
 // ─── Client ────────────────────────────────────────────────────────────────
 
@@ -187,9 +188,27 @@ async function downloadAndCacheImage(url: string): Promise<string> {
     console.log(`[notion] Cached cover image: ${publicUrl}`);
     return publicUrl;
   } catch (error) {
-    // Likely a read-only filesystem error in serverless envs (ENOENT/EPERM). Do not throw.
-    console.warn(`[notion] Could not cache cover image (falling back to remote URL):`, error?.message ?? error);
-    return url; // Fallback to original URL
+    // Likely a read-only filesystem error in serverless envs (ENOENT/EPERM). Try uploading to Supabase Storage as fallback.
+    console.warn(`[notion] Could not cache cover image locally (attempting Supabase upload):`, error?.message ?? error);
+
+    try {
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const buffer = Buffer.from(await resp.arrayBuffer());
+        const contentType = resp.headers.get("content-type") ?? "application/octet-stream";
+        try {
+          const uploaded = await supabaseUploadObject("notion-covers", filename, buffer, contentType);
+          console.log(`[notion] Uploaded cover image to Supabase: ${uploaded}`);
+          return uploaded;
+        } catch (uploadErr) {
+          console.warn("[notion] Supabase upload failed:", uploadErr?.message ?? uploadErr);
+        }
+      }
+    } catch (fetchErr) {
+      console.warn("[notion] Could not fetch remote image for Supabase upload:", fetchErr?.message ?? fetchErr);
+    }
+
+    return url; // Final fallback to remote URL
   }
 }
 

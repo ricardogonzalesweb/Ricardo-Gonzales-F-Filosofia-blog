@@ -121,6 +121,37 @@ export async function supabaseUnsubscribeByEmail(email: string): Promise<boolean
   return rows.length > 0;
 }
 
+/**
+ * Upload a binary object to Supabase Storage and return the public URL.
+ * Bucket must exist. Uses the service role key for authentication.
+ */
+export async function supabaseUploadObject(
+  bucket: string,
+  objectPath: string,
+  data: Buffer | Uint8Array,
+  contentType = "application/octet-stream"
+): Promise<string> {
+  const env = getAppEnv();
+  const uploadUrl = `${env.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/${encodeURIComponent(bucket)}/${encodeURIComponent(objectPath)}`;
+
+  const res = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      apikey: env.supabaseServiceRoleKey,
+      Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
+      "Content-Type": contentType,
+    },
+    body: data,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase storage upload failed: ${res.status} ${text}`);
+  }
+
+  return `${env.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encodeURIComponent(objectPath)}`;
+}
+
 export type PostComment = {
   name: string;
   comment: string;
