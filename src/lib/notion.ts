@@ -189,7 +189,8 @@ async function downloadAndCacheImage(url: string): Promise<string> {
     return publicUrl;
   } catch (error) {
     // Likely a read-only filesystem error in serverless envs (ENOENT/EPERM). Try uploading to Supabase Storage as fallback.
-    console.warn(`[notion] Could not cache cover image locally (attempting Supabase upload):`, error?.message ?? error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.warn(`[notion] Could not cache cover image locally (attempting Supabase upload):`, errMsg);
 
     try {
       const resp = await fetch(url);
@@ -201,11 +202,13 @@ async function downloadAndCacheImage(url: string): Promise<string> {
           console.log(`[notion] Uploaded cover image to Supabase: ${uploaded}`);
           return uploaded;
         } catch (uploadErr) {
-          console.warn("[notion] Supabase upload failed:", uploadErr?.message ?? uploadErr);
+          const uploadMsg = uploadErr instanceof Error ? uploadErr.message : String(uploadErr);
+          console.warn("[notion] Supabase upload failed:", uploadMsg);
         }
       }
     } catch (fetchErr) {
-      console.warn("[notion] Could not fetch remote image for Supabase upload:", fetchErr?.message ?? fetchErr);
+      const fetchMsg = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+      console.warn("[notion] Could not fetch remote image for Supabase upload:", fetchMsg);
     }
 
     return url; // Final fallback to remote URL
