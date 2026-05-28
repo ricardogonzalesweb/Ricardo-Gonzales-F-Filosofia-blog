@@ -30,7 +30,12 @@ export function getAppEnv(): AppEnv {
     import.meta.env.RESEND_FROM_EMAIL,
     process.env.RESEND_FROM_EMAIL
   );
-  const senderName = firstValue(import.meta.env.BREVO_SENDER_NAME, process.env.BREVO_SENDER_NAME) ?? "Newsletter";
+  const senderName = firstValue(
+    import.meta.env.BREVO_SENDER_NAME,
+    process.env.BREVO_SENDER_NAME,
+    import.meta.env.RESEND_SENDER_NAME,
+    process.env.RESEND_SENDER_NAME
+  ) ?? "Newsletter";
   const doubleOptInRaw = firstValue(import.meta.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID, process.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID);
   const templateRaw = firstValue(import.meta.env.BREVO_WELCOME_TEMPLATE_ID, process.env.BREVO_WELCOME_TEMPLATE_ID);
   const listRaw = firstValue(import.meta.env.BREVO_LIST_ID, process.env.BREVO_LIST_ID);
@@ -42,8 +47,8 @@ export function getAppEnv(): AppEnv {
 
   if (!supabaseUrl) throw new Error("Missing environment variable: SUPABASE_URL");
   if (!supabaseServiceRoleKey) throw new Error("Missing environment variable: SUPABASE_SERVICE_ROLE_KEY");
-  if (!brevoApiKey) throw new Error("Missing environment variable: BREVO_API_KEY");
-  if (!fromEmail) throw new Error("Missing environment variable: BREVO_FROM_EMAIL");
+  if (!brevoApiKey) throw new Error("Missing environment variable: BREVO_API_KEY or RESEND_API_KEY");
+  if (!fromEmail) throw new Error("Missing environment variable: BREVO_FROM_EMAIL or RESEND_FROM_EMAIL");
   if (!siteUrl) throw new Error("Missing environment variable: SITE_URL");
 
   return {

@@ -15,6 +15,31 @@ export async function sendEmail(payload: EmailPayload): Promise<void> {
   const env = getAppEnv();
   const recipients = Array.isArray(payload.to) ? payload.to : [payload.to];
 
+  // Se a chave começar com "re_", envia utilizando a API da Resend
+  if (env.brevoApiKey.startsWith("re_")) {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.brevoApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: `${env.brevoSenderName} <${env.brevoFromEmail}>`,
+        to: recipients,
+        subject: payload.subject,
+        html: payload.html,
+        text: payload.text,
+      }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Resend error: ${response.status} ${text}`);
+    }
+    return;
+  }
+
+  // Caso contrário, continua usando a Brevo
   const body: Record<string, any> = {
     sender: {
       name: env.brevoSenderName,

@@ -29,23 +29,78 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <h2>Inscreva-se gratuitamente</h2>
           <p>Junte-se a outros leitores que buscam reflexões profundas sobre fé e razão.</p>
 
-          <form class="nl-form" id="newsletter-form">
-            <input type="text" name="hp_field" autocomplete="off" tabindex="-1" class="hp-field" />
-            <div class="nl-input-group">
-              <input type="email" id="nl-email" name="email" placeholder="seu@email.com" required />
-            </div>
-            <label class="nl-consent">
-              <input type="checkbox" id="nl-consent" name="consent" required />
-              <span>Aceito receber e-mails da newsletter e posso cancelar quando quiser.</span>
-            </label>
-            <button type="submit" class="btn-subscribe">
-              <span>Inscrever-se agora</span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
-            <p id="newsletter-feedback" class="nl-feedback" aria-live="polite"></p>
-          </form>
+          <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
 
-          <p class="nl-disclaimer">
+          <div class="sib-form">
+            <div id="sib-form-container" class="sib-form-container">
+              
+              <div id="error-message" class="sib-form-message-panel">
+                <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                  <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon">
+                    <path d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z" />
+                  </svg>
+                  <span class="sib-form-message-panel__inner-text">
+                    Sua assinatura não pôde ser validada.
+                  </span>
+                </div>
+              </div>
+
+              <div id="success-message" class="sib-form-message-panel">
+                <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                  <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon">
+                    <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z" />
+                  </svg>
+                  <span class="sib-form-message-panel__inner-text">
+                    Você fez sua assinatura com sucesso.
+                  </span>
+                </div>
+              </div>
+
+              <div id="sib-container">
+                <form id="sib-form" method="POST" action="https://f0e706fb.sibforms.com/serve/MUIFAMTNNneDOyuHOxfL8REIppNDSyRlr8KUvz7e02skeu2EHEi0ea79j5Jta7rr2gAv23cF-lV1GP3E9JSLbmKXS8oYNSm31CrNglKp4SElMX3pKKliHx7pTSD7x-p3NvOF5P3l3DWfYkXDpCQ0Lk1DQsqVpz0gEsoN622EoElByKj18foObJetJ8JfTPMCOPnyOc1zGpMiMAmB5A==" data-type="subscription">
+                  
+                  <div class="sib-input sib-form-block">
+                    <div class="form__entry entry_block">
+                      <div class="form__label-row">
+                        <label class="entry__label" for="NOME" data-required="*">Nome</label>
+                        <div class="entry__field">
+                          <input class="input" maxlength="200" type="text" id="NOME" name="NOME" autocomplete="off" placeholder="Seu nome completo" data-required="true" required />
+                        </div>
+                      </div>
+                      <label class="entry__error entry__error--primary"></label>
+                    </div>
+                  </div>
+
+                  <div class="sib-input sib-form-block">
+                    <div class="form__entry entry_block">
+                      <div class="form__label-row">
+                        <label class="entry__label" for="EMAIL" data-required="*">E-mail</label>
+                        <div class="entry__field">
+                          <input class="input" type="email" id="EMAIL" name="EMAIL" autocomplete="off" value="" placeholder="seu@email.com" data-required="true" required />
+                        </div>
+                      </div>
+                      <label class="entry__error entry__error--primary"></label>
+                    </div>
+                  </div>
+
+                  <div class="sib-form-block">
+                    <button class="sib-form-block__button sib-form-block__button-with-loader" form="sib-form" type="submit">
+                      <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512" width="16" height="16">
+                        <path fill="currentColor" d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" />
+                      </svg>
+                      <span>Inscrever-se agora</span>
+                    </button>
+                  </div>
+
+                  <input type="text" name="email_address_check" value="" class="input--hidden">
+                  <input type="hidden" name="locale" value="pt">
+                </form>
+              </div>
+
+            </div>
+          </div>
+
+          <p class="nl-disclaimer" style="margin-top: 1.5rem;">
             🔒 Seus dados estão seguros. Leia nossa <a href="/privacidade">Política de Privacidade</a>.
           </p>
         </div>
@@ -403,59 +458,201 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       padding: 2rem;
     }
   }
-</style>
 
-<script>
-  const form = document.getElementById('newsletter-form') as HTMLFormElement | null;
-  const feedback = document.getElementById('newsletter-feedback') as HTMLElement | null;
-  const status = new URLSearchParams(window.location.search).get("status");
-  if (feedback && status) {
-    if (status === "confirmed") feedback.textContent = "Inscricao confirmada com sucesso.";
-    if (status === "unsubscribed") feedback.textContent = "Seu descadastro foi concluido.";
-    if (status === "invalid") feedback.textContent = "Link invalido ou expirado.";
-    if (status === "error") feedback.textContent = "Nao foi possivel processar sua solicitacao.";
+  /* ── Overrides for Brevo Form ──────────────── */
+  :global(.sib-form) {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+  }
+  
+  :global(#sib-container) {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    max-width: 100% !important;
+    text-align: left !important;
   }
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = form?.querySelector('.btn-subscribe span') as HTMLElement | null;
-    const buttonElement = form?.querySelector('.btn-subscribe') as HTMLButtonElement | null;
-    if (!btn || !buttonElement || !form) return;
+  :global(#sib-form) {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
 
-    buttonElement.disabled = true;
-    btn.textContent = "Enviando...";
-    if (feedback) feedback.textContent = "";
+  :global(.sib-form-block) {
+    padding: 0 !important;
+  }
 
-    const payload = {
-      email: (form.querySelector("#nl-email") as HTMLInputElement)?.value ?? "",
-      consent: (form.querySelector("#nl-consent") as HTMLInputElement)?.checked ?? false,
-      hp_field: (form.querySelector("input[name='hp_field']") as HTMLInputElement)?.value ?? "",
-    };
+  :global(.form__entry) {
+    margin-top: 0 !important;
+  }
 
-    try {
-      const response = await fetch("/api/newsletter/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || "Falha na inscricao.");
-      }
-      btn.textContent = "✓ Quase la!";
-      buttonElement.style.background = "#16a34a";
-      if (feedback) feedback.textContent = "Verifique seu e-mail para confirmar a inscricao.";
-      form.reset();
-    } catch (error) {
-      btn.textContent = "Tentar novamente";
-      buttonElement.style.background = "#dc2626";
-      if (feedback) feedback.textContent = "Nao foi possivel assinar agora. Tente novamente em instantes.";
-    } finally {
-      setTimeout(() => {
-        buttonElement.disabled = false;
-        btn.textContent = "Inscrever-se agora";
-        buttonElement.style.background = "";
-      }, 2200);
+  :global(.entry__label) {
+    font-family: var(--font-display) !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: var(--color-text) !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  :global(.entry__field) {
+    width: 100% !important;
+    background: var(--color-bg) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 10px !important;
+    padding: 0.2rem 0.5rem !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  :global(.entry__field:focus-within) {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 3px rgba(246, 87, 0, 0.12) !important;
+  }
+
+  :global(.sib-form .input) {
+    width: 100% !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.92rem !important;
+    padding: 0.65em 0.5em !important;
+    background: transparent !important;
+    color: var(--color-text) !important;
+    border: none !important;
+    outline: none !important;
+  }
+
+  :global(.sib-form .input::placeholder) {
+    color: var(--color-muted) !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Submit Button styling */
+  :global(.sib-form-block__button) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    padding: 0.9em 2em !important;
+    background: var(--color-accent) !important;
+    color: #fff !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    border-radius: 50px !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s !important;
+    margin-top: 0.3rem !important;
+    height: auto !important;
+    min-height: unset !important;
+    line-height: inherit !important;
+  }
+
+  :global(.sib-form-block__button:hover) {
+    background: #d74800 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 24px rgba(246, 87, 0, 0.35) !important;
+  }
+
+  /* Hide helper text / specification unless needed */
+  :global(.entry__specification) {
+    display: none !important;
+  }
+
+  /* Message panels styling */
+  :global(.sib-form-message-panel) {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 1.5rem !important;
+    border: 1px solid !important;
+  }
+
+  :global(#error-message) {
+    color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+  }
+
+  :global(#success-message) {
+    color: #22c55e !important;
+    background-color: rgba(34, 197, 94, 0.08) !important;
+    border-color: rgba(34, 197, 94, 0.2) !important;
+  }
+
+  :global(.sib-form-message-panel__text) {
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  :global(.sib-form-message-panel__text svg) {
+    width: 20px !important;
+    height: 20px !important;
+    fill: currentColor !important;
+  }
+
+  /* Field error message styling */
+  :global(.entry__error) {
+    display: none;
+    font-size: 0.8rem !important;
+    color: #ef4444 !important;
+    margin-top: 0.3rem !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+</style>
+
+<script is:inline>
+  window.REQUIRED_CODE_ERROR_MESSAGE = 'Escolha um código de país';
+  window.LOCALE = 'pt';
+  window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "A informação fornecida não é valida. Verifique o formato do campo e tente novamente.";
+  window.REQUIRED_ERROR_MESSAGE = "Este campo não pode ser deixado em branco. ";
+  window.GENERIC_INVALID_MESSAGE = "A informação fornecida não é valida. Verifique o formato do campo e tente novamente.";
+  window.INVALID_NUMBER = "A informação fornecida não é valida. Verifique o formato do campo e tente novamente.";
+  window.INVALID_DATE = "Insira uma data válida";
+  window.REQUIRED_MULTISELECT_MESSAGE = 'Selecione pelo menos 1 opção';
+  window.translation = {
+    common: {
+      selectedList: '{quantity} lista selecionada',
+      selectedLists: '{quantity} listas selecionadas',
+      selectedOption: '{quantity} selecionado',
+      selectedOptions: '{quantity} selecionados',
     }
-  });
+  };
+  var AUTOHIDE = Boolean(0);
+</script>
+<script defer src="https://sibforms.com/forms/end-form/build/main.js" is:inline></script>
+
+<script>
+  const successMsg = document.getElementById('success-message');
+  const errorMsg = document.getElementById('error-message');
+  
+  if (successMsg || errorMsg) {
+    const status = new URLSearchParams(window.location.search).get("status");
+    if (status === "confirmed" && successMsg) {
+      const innerText = successMsg.querySelector('.sib-form-message-panel__inner-text');
+      if (innerText) innerText.textContent = "Inscrição confirmada com sucesso.";
+      successMsg.style.display = 'block';
+    } else if (status === "unsubscribed" && successMsg) {
+      const innerText = successMsg.querySelector('.sib-form-message-panel__inner-text');
+      if (innerText) innerText.textContent = "Seu descadastro foi concluído.";
+      successMsg.style.display = 'block';
+    } else if (status === "invalid" && errorMsg) {
+      const innerText = errorMsg.querySelector('.sib-form-message-panel__inner-text');
+      if (innerText) innerText.textContent = "Link inválido ou expirado.";
+      errorMsg.style.display = 'block';
+    } else if (status === "error" && errorMsg) {
+      const innerText = errorMsg.querySelector('.sib-form-message-panel__inner-text');
+      if (innerText) innerText.textContent = "Não foi possível processar sua solicitação.";
+      errorMsg.style.display = 'block';
+    }
+  }
 </script>
