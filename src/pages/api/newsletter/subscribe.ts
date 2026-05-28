@@ -49,6 +49,8 @@ export const POST: APIRoute = async ({ request }) => {
         id: brevoDoubleOptInTemplateId,
         variables: {
           confirmation_url: confirmUrl,
+          doubleoptin: confirmUrl,
+          double_opt_in: confirmUrl,
         },
       },
     });
