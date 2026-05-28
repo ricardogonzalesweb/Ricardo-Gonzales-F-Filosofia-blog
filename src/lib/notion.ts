@@ -13,6 +13,7 @@ import { supabaseUploadObject } from "./supabase";
 
 const NOTION_TOKEN = import.meta.env.NOTION_TOKEN;
 const NOTION_DATABASE_ID = import.meta.env.NOTION_DATABASE_ID;
+let notionClient: Client | undefined;
 
 function normalizeNotionId(value: string | undefined): string | undefined {
   if (!value) return undefined;
@@ -27,25 +28,38 @@ function normalizeNotionId(value: string | undefined): string | undefined {
   ].join("-");
 }
 
-const DATABASE_ID = normalizeNotionId(NOTION_DATABASE_ID) ?? "";
+function getNotionConfig(): { token: string; databaseId: string } {
+  const databaseId = normalizeNotionId(NOTION_DATABASE_ID) ?? "";
 
-if (!NOTION_TOKEN) {
-  throw new Error("Missing NOTION_TOKEN environment variable.");
+  if (!NOTION_TOKEN) {
+    throw new Error("Missing NOTION_TOKEN environment variable.");
+  }
+
+  if (!databaseId) {
+    throw new Error("Missing NOTION_DATABASE_ID environment variable.");
+  }
+
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(databaseId)) {
+    throw new Error(
+      "Invalid NOTION_DATABASE_ID environment variable. Verify the database ID and use the ID from the Notion database URL."
+    );
+  }
+
+  return {
+    token: NOTION_TOKEN,
+    databaseId,
+  };
 }
 
-if (!DATABASE_ID) {
-  throw new Error("Missing NOTION_DATABASE_ID environment variable.");
-}
+function getNotionClient(): Client {
+  if (!notionClient) {
+    notionClient = new Client({
+      auth: getNotionConfig().token,
+    });
+  }
 
-if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(DATABASE_ID)) {
-  throw new Error(
-    "Invalid NOTION_DATABASE_ID environment variable. Verify the database ID and use the ID from the Notion database URL."
-  );
+  return notionClient;
 }
-
-export const notion = new Client({
-  auth: NOTION_TOKEN,
-});
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -332,17 +346,20 @@ async function resolveDataSourceId(): Promise<string> {
     return cachedDataSourceId;
   }
 
+  const { databaseId } = getNotionConfig();
+  const notion = getNotionClient();
+
   try {
     const database = (await notion.databases.retrieve({
-      database_id: DATABASE_ID,
+      database_id: databaseId,
     })) as unknown as { data_sources?: Array<{ id: string }> };
 
-    cachedDataSourceId = database.data_sources?.[0]?.id ?? DATABASE_ID;
+    cachedDataSourceId = database.data_sources?.[0]?.id ?? databaseId;
     return cachedDataSourceId;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `Failed to resolve Notion data source ID from database ${DATABASE_ID}: ${message}. ` +
+      `Failed to resolve Notion data source ID from database ${databaseId}: ${message}. ` +
         "Verify NOTION_DATABASE_ID and that the integration has access to the database."
     );
   }
@@ -352,6 +369,7 @@ async function queryDataSource(
   body: Record<string, unknown>
 ): Promise<{ results: unknown[] }> {
   const dataSourceId = await resolveDataSourceId();
+  const notion = getNotionClient();
 
   try {
     return (await notion.dataSources.query({
@@ -393,6 +411,7 @@ export async function getPosts(): Promise<Post[]> {
  * children for blocks that have has_children = true (e.g. quote, callout, toggle).
  */
 async function fetchBlocksWithChildren(blockId: string): Promise<BlockObjectResponse[]> {
+  const notion = getNotionClient();
   const blocksResponse = await notion.blocks.children.list({
     block_id: blockId,
     page_size: 100,
