@@ -3,11 +3,12 @@ import type { APIRoute } from "astro";
 import { supabaseGetApprovedComments } from "../../lib/supabase";
 import { jsonResponse } from "../../lib/validation";
 
+// Cache bust comment to force fresh Vercel function compilation
 export const GET: APIRoute = async ({ url }) => {
   const slug = url.searchParams.get("slug")?.trim();
 
   if (!slug) {
-    return jsonResponse({ ok: false, error: "Parâmetro slug é obrigatório." }, 400);
+    return jsonResponse({ ok: false, error: "Parametro slug e obrigatorio." }, 400);
   }
 
   try {
@@ -15,6 +16,6 @@ export const GET: APIRoute = async ({ url }) => {
     return jsonResponse({ ok: true, comments });
   } catch (error) {
     console.error(`Error loading comments for ${slug}:`, error);
-    return jsonResponse({ ok: false, error: "Não foi possível carregar os comentários." }, 500);
+    return jsonResponse({ ok: false, error: "Nao foi possivel carregar os comentarios." }, 500);
   }
 };
