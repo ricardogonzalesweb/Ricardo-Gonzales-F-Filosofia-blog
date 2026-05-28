@@ -67,7 +67,7 @@ function extractTocItems(blocks: any[]): TocItem[] {
 const tocItems = extractTocItems(post.blocks);
 
 // Schema JSON-LD para melhor indexação nos buscadores
-const siteUrl = Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br";
+const siteUrl = (Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br").toString().replace(/\/$/, "");
 const canonicalUrl = Astro.request?.url
   ? new URL(Astro.request.url, siteUrl).toString()
   : siteUrl;

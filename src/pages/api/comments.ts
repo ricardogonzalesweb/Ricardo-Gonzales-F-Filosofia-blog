@@ -16,7 +16,10 @@ export const GET: APIRoute = async ({ url }) => {
     const comments = await supabaseGetApprovedComments(slug);
     return new Response(JSON.stringify({ ok: true, comments }), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, max-age=0",
+      },
     });
   } catch (error: any) {
     console.error(`Error loading comments for ${slug}:`, error);

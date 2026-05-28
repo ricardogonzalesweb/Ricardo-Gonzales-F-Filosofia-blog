@@ -11,13 +11,14 @@ export type AppEnv = {
   siteUrl: string;
 };
 
+export type SupabaseEnv = Pick<AppEnv, "supabaseUrl" | "supabaseServiceRoleKey">;
+
 function firstValue(...values: Array<string | undefined>): string | undefined {
   return values.map((value) => value?.trim()).find(Boolean);
 }
 
 export function getAppEnv(): AppEnv {
-  const supabaseUrl = firstValue(import.meta.env.SUPABASE_URL, process.env.SUPABASE_URL);
-  const supabaseServiceRoleKey = firstValue(import.meta.env.SUPABASE_SERVICE_ROLE_KEY, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const { supabaseUrl, supabaseServiceRoleKey } = getSupabaseEnv();
   const brevoApiKey = firstValue(
     import.meta.env.BREVO_API_KEY,
     process.env.BREVO_API_KEY,
@@ -45,8 +46,6 @@ export function getAppEnv(): AppEnv {
   const templateId = templateRaw ? Number(templateRaw) : undefined;
   const listId = listRaw ? Number(listRaw) : undefined;
 
-  if (!supabaseUrl) throw new Error("Missing environment variable: SUPABASE_URL");
-  if (!supabaseServiceRoleKey) throw new Error("Missing environment variable: SUPABASE_SERVICE_ROLE_KEY");
   if (!brevoApiKey) throw new Error("Missing environment variable: BREVO_API_KEY or RESEND_API_KEY");
   if (!fromEmail) throw new Error("Missing environment variable: BREVO_FROM_EMAIL or RESEND_FROM_EMAIL");
   if (!siteUrl) throw new Error("Missing environment variable: SITE_URL");
@@ -62,5 +61,18 @@ export function getAppEnv(): AppEnv {
     brevoListId: Number.isFinite(listId) ? listId : undefined,
     contactInboxEmail: contactInboxEmail ?? fromEmail,
     siteUrl,
+  };
+}
+
+export function getSupabaseEnv(): SupabaseEnv {
+  const supabaseUrl = firstValue(import.meta.env.SUPABASE_URL, process.env.SUPABASE_URL);
+  const supabaseServiceRoleKey = firstValue(import.meta.env.SUPABASE_SERVICE_ROLE_KEY, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  if (!supabaseUrl) throw new Error("Missing environment variable: SUPABASE_URL");
+  if (!supabaseServiceRoleKey) throw new Error("Missing environment variable: SUPABASE_SERVICE_ROLE_KEY");
+
+  return {
+    supabaseUrl,
+    supabaseServiceRoleKey,
   };
 }

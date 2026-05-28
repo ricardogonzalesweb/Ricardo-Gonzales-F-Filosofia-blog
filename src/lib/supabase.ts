@@ -1,7 +1,7 @@
-import { getAppEnv } from "./env";
+import { getSupabaseEnv } from "./env";
 
 export async function supabaseInsert(table: string, payload: Record<string, unknown>): Promise<void> {
-  const env = getAppEnv();
+  const env = getSupabaseEnv();
   const response = await fetch(`${env.supabaseUrl}/rest/v1/${table}`, {
     method: "POST",
     headers: {
@@ -20,7 +20,7 @@ export async function supabaseInsert(table: string, payload: Record<string, unkn
 }
 
 export async function supabaseUpsertSubscriber(email: string, token: string, source: string): Promise<void> {
-  const env = getAppEnv();
+  const env = getSupabaseEnv();
   const response = await fetch(`${env.supabaseUrl}/rest/v1/newsletter_subscribers?on_conflict=email`, {
     method: "POST",
     headers: {
@@ -47,7 +47,7 @@ export async function supabaseUpsertSubscriber(email: string, token: string, sou
 }
 
 export async function supabaseActivateSubscriber(token: string): Promise<string | null> {
-  const env = getAppEnv();
+  const env = getSupabaseEnv();
   const query = new URLSearchParams({
     select: "id,email,status",
     confirm_token: `eq.${token}`,
@@ -98,7 +98,7 @@ export async function supabaseActivateSubscriber(token: string): Promise<string 
 }
 
 export async function supabaseUnsubscribeByEmail(email: string): Promise<boolean> {
-  const env = getAppEnv();
+  const env = getSupabaseEnv();
   const response = await fetch(`${env.supabaseUrl}/rest/v1/newsletter_subscribers?email=eq.${encodeURIComponent(email)}`, {
     method: "PATCH",
     headers: {
@@ -132,7 +132,7 @@ export async function supabaseUploadObject(
   data: Buffer | Uint8Array,
   contentType = "application/octet-stream"
 ): Promise<string> {
-  const env = getAppEnv();
+  const env = getSupabaseEnv();
   const uploadUrl = `${env.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/${encodeURIComponent(bucket)}/${encodeURIComponent(objectPath)}`;
 
   const bodyData = Buffer.isBuffer(data) ? new Uint8Array(data) : data;
@@ -146,6 +146,7 @@ export async function supabaseUploadObject(
       apikey: env.supabaseServiceRoleKey,
       Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
       "Content-Type": contentType,
+      "x-upsert": "true",
     },
     body: fetchBody,
   });
@@ -174,7 +175,7 @@ function normalizeSlug(value: string): string {
 }
 
 export async function supabaseGetApprovedComments(postSlug: string): Promise<PostComment[]> {
-  const env = getAppEnv();
+  const env = getSupabaseEnv();
   const normalized = normalizeSlug(postSlug);
   const headers = {
     apikey: env.supabaseServiceRoleKey,

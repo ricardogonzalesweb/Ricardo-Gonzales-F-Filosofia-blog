@@ -145,6 +145,7 @@ function getStatus(props: Record<string, any>): Post["status"] {
 // ─── Image Caching ─────────────────────────────────────────────────────────
 
 const COVERS_DIR = path.join(process.cwd(), "public", "notion-covers");
+const USE_LOCAL_COVER_CACHE = import.meta.env.DEV;
 
 /**
  * Downloads a remote image and saves it to public/notion-covers/.
@@ -166,9 +167,30 @@ async function downloadAndCacheImage(url: string): Promise<string> {
   const localPath = path.join(COVERS_DIR, filename);
   const publicUrl = `/notion-covers/${filename}`;
 
-  // If already downloaded, skip
-  if (fs.existsSync(localPath)) {
+  // Local public files are useful in dev, but they are ignored by git and
+  // are not guaranteed to exist in production deployments.
+  if (USE_LOCAL_COVER_CACHE && fs.existsSync(localPath)) {
     return publicUrl;
+  }
+
+  if (!USE_LOCAL_COVER_CACHE) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.warn(`[notion] Failed to fetch cover image for Supabase: ${response.status} ${url}`);
+        return url;
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const contentType = response.headers.get("content-type") ?? "application/octet-stream";
+      const uploaded = await supabaseUploadObject("notion-covers", filename, buffer, contentType);
+      console.log(`[notion] Uploaded cover image to Supabase: ${uploaded}`);
+      return uploaded;
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.warn(`[notion] Could not upload cover image to Supabase:`, errMsg);
+      return url;
+    }
   }
 
   // Try to create directory and save file. On read-only filesystems (e.g. serverless),
@@ -236,23 +258,37 @@ function isNotionHostedUrl(url: string): boolean {
 async function getCoverImage(page: PageObjectResponse, props: Record<string, any>): Promise<string | null> {
   let url: string | null = null;
 
+  // Try to get cover from page.cover first
   if (page.cover?.type === "external") {
     url = page.cover.external.url;
+    console.log(`[notion] Cover from page.cover.external: ${url}`);
   } else if (page.cover?.type === "file") {
     url = page.cover.file.url;
+    console.log(`[notion] Cover from page.cover.file: ${url}`);
   } else {
+    // Fallback to properties
     const fileProp = props.Cover?.files ?? [];
     const file = fileProp[0];
     url = file?.external?.url ?? file?.file?.url ?? null;
+    if (url) {
+      console.log(`[notion] Cover from props.Cover.files: ${url}`);
+    }
   }
 
-  if (!url) return null;
+  if (!url) {
+    console.log(`[notion] No cover image found for page ${page.id}`);
+    return null;
+  }
 
   // Only download & cache Notion-hosted (temporary) URLs
   if (isNotionHostedUrl(url)) {
-    return downloadAndCacheImage(url);
+    console.log(`[notion] URL is Notion-hosted, attempting to download & cache...`);
+    const cached = await downloadAndCacheImage(url);
+    console.log(`[notion] Downloaded & cached cover: ${cached}`);
+    return cached;
   }
 
+  console.log(`[notion] URL is external, returning as-is: ${url}`);
   return url;
 }
 
