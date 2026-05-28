@@ -67,6 +67,7 @@ export async function supabaseActivateSubscriber(token: string): Promise<string 
   }
 
   const rows = (await findResponse.json()) as Array<{ id: string; email: string; status: string }>;
+  console.log(`[supabaseActivateSubscriber] Token lookup result: ${rows.length} row(s) found`);
   const row = rows[0];
   if (!row) return null;
 

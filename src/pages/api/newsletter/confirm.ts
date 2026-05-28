@@ -14,6 +14,7 @@ export const GET: APIRoute = async ({ url, redirect }) => {
   try {
     const email = await supabaseActivateSubscriber(token);
     if (!email) {
+      console.error(`[confirm] Token not found in DB. Token prefix: ${token.slice(0, 8)}...`);
       return redirect("/newsletter?status=invalid", 302);
     }
 
