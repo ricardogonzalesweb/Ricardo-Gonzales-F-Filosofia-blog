@@ -1,44 +1,30 @@
 export const prerender = false;
 import type { APIRoute } from "astro";
 import { getAppEnv } from "../../lib/env";
-import { supabaseActivateSubscriber } from "../../lib/supabase";
+import { supabaseGetApprovedComments } from "../../lib/supabase";
 
 export const GET: APIRoute = async () => {
   try {
     const env = getAppEnv();
+    const testSlug = "ansiedade-santo-agostinho-ja-explicava-isso-ha-seculos";
     
-    // Test activate subscriber with the specific token
-    const testToken = "3f64cbf9a839b58149037d3d99e862e94c4c84cec71c312a";
-    let activationResult: any = null;
-    let activationError: string | null = null;
-    
+    let commentsResult: any = null;
+    let commentsError: string | null = null;
+    let commentsStack: string | null = null;
+
     try {
-      activationResult = await supabaseActivateSubscriber(testToken);
+      commentsResult = await supabaseGetApprovedComments(testSlug);
     } catch (e: any) {
-      activationError = e.message;
+      commentsError = e.message;
+      commentsStack = e.stack;
     }
-
-    // Direct fetch test
-    const query = new URLSearchParams({
-      select: "id,email,status",
-      confirm_token: `eq.${testToken}`,
-      limit: "1",
-    });
-    const res = await fetch(`${env.supabaseUrl}/rest/v1/newsletter_subscribers?${query.toString()}`, {
-      headers: {
-        apikey: env.supabaseServiceRoleKey,
-        Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
-      },
-    });
-
-    const directRows = res.ok ? await res.json() : null;
 
     return new Response(JSON.stringify({ 
       ok: true, 
-      testToken,
-      activationResult,
-      activationError,
-      directRows,
+      testSlug,
+      commentsResult,
+      commentsError,
+      commentsStack,
       envStatus: {
         hasSupabaseUrl: !!env.supabaseUrl,
         supabaseUrl: env.supabaseUrl,
