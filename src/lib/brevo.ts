@@ -71,3 +71,26 @@ export async function upsertBrevoContactToList(email: string, listId: number): P
     throw new Error(`Brevo contact error: ${response.status} ${text}`);
   }
 }
+
+export async function sendBrevoDoubleOptIn(email: string, templateId: number, listId: number, redirectionUrl: string): Promise<void> {
+  const env = getAppEnv();
+  const response = await fetch("https://api.brevo.com/v3/contacts/doubleOptinConfirmation", {
+    method: "POST",
+    headers: {
+      "api-key": env.brevoApiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      includeListIds: [listId],
+      templateId,
+      redirectionUrl,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Brevo double opt-in error: ${response.status} ${text}`);
+  }
+}

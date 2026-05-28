@@ -40,12 +40,17 @@ export const POST: APIRoute = async ({ request }) => {
 
     const env = getAppEnv();
     const confirmUrl = `${env.siteUrl}/api/newsletter/confirm?token=${token}`;
+    const brevoDoubleOptInTemplateId = env.brevoDoubleOptInTemplateId ?? 2;
 
     await sendEmail({
       to: email,
-      subject: "Confirme sua inscricao na newsletter",
-      html: `<h2>Confirme sua inscricao</h2><p>Para concluir, clique no link abaixo:</p><p><a href="${confirmUrl}">Confirmar inscricao</a></p><p>Se voce nao solicitou, ignore este e-mail.</p>`,
-      text: `Confirme sua inscricao acessando: ${confirmUrl}`,
+      subject: "Confirme sua inscrição na newsletter",
+      template: {
+        id: brevoDoubleOptInTemplateId,
+        variables: {
+          confirmation_url: confirmUrl,
+        },
+      },
     });
 
     return jsonResponse({ ok: true, message: "Enviamos um e-mail para confirmar sua inscricao." });
