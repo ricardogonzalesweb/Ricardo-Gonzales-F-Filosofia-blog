@@ -260,9 +260,12 @@ function isNotionHostedUrl(url: string): boolean {
     const hostname = new URL(url).hostname;
     return (
       hostname.includes("s3.us-west-2.amazonaws.com") ||
+      hostname.includes("s3-us-west-2.amazonaws.com") ||
       hostname.includes("s3.amazonaws.com") ||
       hostname.includes("prod-files-secure") ||
-      hostname.includes("secure.notion-static.com")
+      hostname.includes("secure.notion-static.com") ||
+      hostname.includes("notion-static.com") ||
+      hostname.includes("files.notion.so")
     );
   } catch {
     return false;
@@ -317,12 +320,20 @@ async function cacheNotionHostedFileUrl(url: string): Promise<string> {
 async function cacheBlockFileUrls(blocks: BlockObjectResponse[]): Promise<BlockObjectResponse[]> {
   await Promise.all(
     blocks.map(async (block: any) => {
-      if (block.type === "image" && block.image?.type === "file" && block.image.file?.url) {
-        block.image.file.url = await cacheNotionHostedFileUrl(block.image.file.url);
+      if (block.type === "image") {
+        if (block.image?.type === "file" && block.image.file?.url) {
+          block.image.file.url = await cacheNotionHostedFileUrl(block.image.file.url);
+        } else if (block.image?.type === "external" && block.image.external?.url) {
+          block.image.external.url = await cacheNotionHostedFileUrl(block.image.external.url);
+        }
       }
 
-      if (block.type === "callout" && block.callout?.icon?.type === "file" && block.callout.icon.file?.url) {
-        block.callout.icon.file.url = await cacheNotionHostedFileUrl(block.callout.icon.file.url);
+      if (block.type === "callout") {
+        if (block.callout?.icon?.type === "file" && block.callout.icon.file?.url) {
+          block.callout.icon.file.url = await cacheNotionHostedFileUrl(block.callout.icon.file.url);
+        } else if (block.callout?.icon?.type === "external" && block.callout.icon.external?.url) {
+          block.callout.icon.external.url = await cacheNotionHostedFileUrl(block.callout.icon.external.url);
+        }
       }
 
       if (Array.isArray(block._children) && block._children.length > 0) {
