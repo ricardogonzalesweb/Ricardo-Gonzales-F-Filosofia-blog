@@ -306,6 +306,34 @@ async function getCoverImage(page: PageObjectResponse, props: Record<string, any
   return url;
 }
 
+async function cacheNotionHostedFileUrl(url: string): Promise<string> {
+  if (!isNotionHostedUrl(url)) {
+    return url;
+  }
+
+  return downloadAndCacheImage(url);
+}
+
+async function cacheBlockFileUrls(blocks: BlockObjectResponse[]): Promise<BlockObjectResponse[]> {
+  await Promise.all(
+    blocks.map(async (block: any) => {
+      if (block.type === "image" && block.image?.type === "file" && block.image.file?.url) {
+        block.image.file.url = await cacheNotionHostedFileUrl(block.image.file.url);
+      }
+
+      if (block.type === "callout" && block.callout?.icon?.type === "file" && block.callout.icon.file?.url) {
+        block.callout.icon.file.url = await cacheNotionHostedFileUrl(block.callout.icon.file.url);
+      }
+
+      if (Array.isArray(block._children) && block._children.length > 0) {
+        await cacheBlockFileUrls(block._children);
+      }
+    })
+  );
+
+  return blocks;
+}
+
 function getAuthor(props: Record<string, any>, page: PageObjectResponse): string {
   const authorText = richTextToPlain(
     props.Autor?.rich_text ?? props.Author?.rich_text ?? []
@@ -450,7 +478,7 @@ export async function getPostBySlug(
 
   return {
     ...post,
-    blocks,
+    blocks: await cacheBlockFileUrls(blocks),
   };
 }
 
