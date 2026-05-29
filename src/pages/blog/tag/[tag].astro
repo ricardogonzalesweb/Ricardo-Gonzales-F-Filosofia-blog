@@ -3,20 +3,15 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 import PostCard from "../../../components/PostCard.astro";
 import { getAllTags, getPostsByTag } from "../../../lib/notion";
 
-export const prerender = true;
-
-export async function getStaticPaths() {
-  const tags = await getAllTags();
-  return tags.map((tag) => ({
-    params: { tag: tag.toLowerCase() },
-    props: { tagLabel: tag },
-  }));
-}
-
 const { tag } = Astro.params;
-const { tagLabel } = Astro.props;
-const posts = await getPostsByTag(tagLabel);
+if (!tag) {
+  return Astro.redirect("/blog");
+}
 const allTags = await getAllTags();
+const tagLabel = allTags.find((t) => t.toLowerCase() === tag.toLowerCase()) || tag;
+const posts = await getPostsByTag(tagLabel);
+
+
 ---
 
 <BaseLayout
