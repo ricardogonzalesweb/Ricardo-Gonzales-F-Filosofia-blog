@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # Cached Notion cover images (downloaded during build)
 public/notion-covers/
+
+# Embedded git repository (not a submodule)
+ricardogonzalesweb/
