@@ -143,6 +143,10 @@ const schemaArticle = {
           <a class="share-link linkedin" data-network="linkedin" title="Compartilhar no LinkedIn">LinkedIn</a>
           <a class="share-link whatsapp" data-network="whatsapp" title="Compartilhar no WhatsApp">WhatsApp</a>
           <a class="share-link email" data-network="email" title="Compartilhar por e-mail">E-mail</a>
+          <button id="copy-link-btn" class="share-link copy-link" title="Copiar link do artigo" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copy-link-label">Copiar link</span>
+          </button>
         </div>
       </section>
 
@@ -322,6 +326,18 @@ const schemaArticle = {
     color: var(--color-accent);
   }
 
+  .copy-link {
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+  }
+
+  .copy-link.copied {
+    background: var(--color-accent-subtle);
+    color: var(--color-accent);
+    transform: scale(1.04);
+  }
+
   .post-footer {
     border-top: 1px solid var(--color-border);
     padding: 2rem 0 4rem;
@@ -355,7 +371,7 @@ const schemaArticle = {
 <script>
   // Preenche links de compartilhamento usando a URL atual
   (function () {
-    const shareLinks = document.querySelectorAll(".share-link");
+    const shareLinks = document.querySelectorAll(".share-link[data-network]");
     if (!shareLinks || shareLinks.length === 0) return;
 
     const pageUrl = location.href;
@@ -388,6 +404,37 @@ const schemaArticle = {
       a.setAttribute('href', href);
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
+    });
+  })();
+
+  // Botão Copiar Link
+  (function () {
+    const btn = document.getElementById('copy-link-btn') as HTMLButtonElement | null;
+    const label = document.getElementById('copy-link-label');
+    if (!btn || !label) return;
+
+    btn.addEventListener('click', async () => {
+      const url = location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        // Fallback para navegadores sem suporte à Clipboard API
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      label.textContent = 'Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        label.textContent = 'Copiar link';
+        btn.classList.remove('copied');
+      }, 2000);
     });
   })();
 </script>
