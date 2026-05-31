@@ -138,7 +138,7 @@ const schemaArticle = {
       <section class="post-share" data-post-excerpt={post.excerpt}>
         <h2>Compartilhar</h2>
         <div class="share-buttons">
-          <a class="share-link twitter" data-network="twitter" title="Compartilhar no Twitter">Twitter</a>
+          <a class="share-link twitter" data-network="twitter" title="Compartilhar no X">X</a>
           <a class="share-link facebook" data-network="facebook" title="Compartilhar no Facebook">Facebook</a>
           <a class="share-link linkedin" data-network="linkedin" title="Compartilhar no LinkedIn">LinkedIn</a>
           <a class="share-link whatsapp" data-network="whatsapp" title="Compartilhar no WhatsApp">WhatsApp</a>
@@ -386,7 +386,7 @@ const schemaArticle = {
       let href = '#';
       switch (net) {
         case 'twitter':
-          href = `https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+          href = `https://x.com/intent/tweet?text=${t}&url=${u}`;
           break;
         case 'facebook':
           href = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
@@ -398,7 +398,7 @@ const schemaArticle = {
           href = `https://api.whatsapp.com/send?text=${t}%0A%0A${d}%0A%0A${u}`;
           break;
         case 'email':
-          href = `mailto:?subject=${t}&body=${t}%0A%0A${d}%0A%0A${u}`;
+          href = `mailto:?subject=${t}&body=${t}%0A%0A${d}%0A%0A${pageUrl}`;
           break;
       }
       a.setAttribute('href', href);
