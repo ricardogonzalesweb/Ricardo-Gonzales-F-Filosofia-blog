@@ -77,6 +77,15 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "");
       href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <script>
+      import Clarity from "@microsoft/clarity";
+
+      const clarityProjectId = import.meta.env.PUBLIC_CLARITY_PROJECT_ID;
+
+      if (clarityProjectId) {
+        Clarity.init(clarityProjectId);
+      }
+    </script>
   </head>
 
   <body>
