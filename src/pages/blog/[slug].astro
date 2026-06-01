@@ -380,6 +380,9 @@ const schemaArticle = {
     const u = encodeURIComponent(pageUrl);
     const t = encodeURIComponent(title);
     const d = encodeURIComponent(excerpt);
+    const emailBody = encodeURIComponent(
+      `${title}\n\n${excerpt ? `${excerpt}\n\n` : ""}Leia o artigo completo:\n${pageUrl}`
+    );
 
     shareLinks.forEach((a) => {
       const net = (a as HTMLElement).dataset.network;
@@ -398,7 +401,7 @@ const schemaArticle = {
           href = `https://api.whatsapp.com/send?text=${t}%0A%0A${d}%0A%0A${u}`;
           break;
         case 'email':
-          href = `mailto:?subject=${t}&body=${t}%0A%0A${d}%0A%0A${pageUrl}`;
+          href = `mailto:?subject=${t}&body=${emailBody}`;
           break;
       }
       a.setAttribute('href', href);
