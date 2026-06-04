@@ -57,6 +57,9 @@ function extractTocItems(blocks: any[]): TocItem[] {
 }
 
 const tocItems = extractTocItems(post.blocks);
+const latestPosts = (await getPosts())
+  .filter((latestPost) => latestPost.slug !== post.slug)
+  .slice(0, 2);
 
 // Schema JSON-LD para melhor indexação nos buscadores
 const siteUrl = (Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br").toString().replace(/\/$/, "");
@@ -153,6 +156,31 @@ const schemaArticle = {
       <footer class="post-footer">
         <a href="/blog" class="back-link">← Voltar para artigos</a>
       </footer>
+
+      {latestPosts.length > 0 && (
+        <section class="latest-posts" aria-labelledby="latest-posts-title">
+          <h2 id="latest-posts-title">Últimos posts</h2>
+          <div class="latest-posts-grid">
+            {latestPosts.map((latestPost) => (
+              <a class="latest-post-card" href={`/blog/${latestPost.slug}`}>
+                {latestPost.coverImage ? (
+                  <div class="latest-post-cover">
+                    <img src={latestPost.coverImage} alt={latestPost.title} loading="lazy" />
+                  </div>
+                ) : (
+                  <div class="latest-post-cover latest-post-cover-placeholder">
+                    <span>{latestPost.title[0]?.toUpperCase()}</span>
+                  </div>
+                )}
+                <div class="latest-post-body">
+                  <h3>{latestPost.title}</h3>
+                  {latestPost.excerpt && <p>{latestPost.excerpt}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   </article>
 </BaseLayout>
@@ -340,7 +368,7 @@ const schemaArticle = {
 
   .post-footer {
     border-top: 1px solid var(--color-border);
-    padding: 2rem 0 4rem;
+    padding: 2rem 0;
   }
 
   .back-link {
@@ -350,6 +378,119 @@ const schemaArticle = {
     text-decoration: none;
   }
   .back-link:hover { text-decoration: underline; }
+
+  .latest-posts {
+    border-top: 1px solid var(--color-border);
+    padding: 2rem 0 4rem;
+  }
+
+  .latest-posts h2 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin: 0 0 1rem;
+  }
+
+  .latest-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .latest-post-card {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 1rem;
+    align-items: stretch;
+    min-height: 132px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text);
+    text-decoration: none;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--color-shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .latest-post-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(246, 87, 0, 0.35);
+    box-shadow: 0 8px 24px var(--color-shadow);
+  }
+
+  .latest-post-cover {
+    width: 140px;
+    min-height: 132px;
+    background: var(--color-placeholder-bg);
+    overflow: hidden;
+  }
+
+  .latest-post-cover img {
+    width: 100%;
+    height: 100%;
+    min-height: 132px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .latest-post-cover-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-placeholder-text);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+  .latest-post-body {
+    min-width: 0;
+    padding: 1rem 1rem 1rem 0;
+  }
+
+  .latest-post-body h3 {
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    line-height: 1.35;
+    margin: 0 0 0.45rem;
+  }
+
+  .latest-post-body p {
+    color: var(--color-muted);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (max-width: 780px) {
+    .latest-posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .latest-post-card {
+      grid-template-columns: 1fr;
+    }
+
+    .latest-post-cover {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 0;
+    }
+
+    .latest-post-cover img {
+      min-height: 0;
+    }
+
+    .latest-post-body {
+      padding: 0 1rem 1rem;
+    }
+  }
 
   @media (min-width: 1100px) {
     .post-container {
