@@ -71,6 +71,7 @@ export interface Post {
   coverImage: string | null;
   publishedAt: string;
   tags: string[];
+  categories: string[];
   author: string;
   status: "Published" | "Draft";
 }
@@ -135,7 +136,13 @@ export function formatNotionDate(
 }
 
 function getTags(props: Record<string, any>): string[] {
-  return (props.Tags?.multi_select ?? props.Categorias?.multi_select ?? []).map(
+  return (props.Tags?.multi_select ?? []).map(
+    (t: { name: string }) => t.name
+  );
+}
+
+function getCategories(props: Record<string, any>): string[] {
+  return (props.Categorias?.multi_select ?? []).map(
     (t: { name: string }) => t.name
   );
 }
@@ -371,11 +378,12 @@ async function pageToPost(page: PageObjectResponse): Promise<Post> {
   const excerpt = getExcerpt(props);
   const publishedAt = getPublishedAt(props, page);
   const tags = getTags(props);
+  const categories = getCategories(props);
   const author = getAuthor(props, page);
   const status = getStatus(props);
   const coverImage = await getCoverImage(page, props);
 
-  return { id: page.id, slug, title, excerpt, coverImage, publishedAt, tags, author, status };
+  return { id: page.id, slug, title, excerpt, coverImage, publishedAt, tags, categories, author, status };
 }
 
 let cachedDataSourceId: string | undefined;
@@ -510,9 +518,33 @@ export async function getPostsByTag(tag: string): Promise<Post[]> {
   );
 }
 
+/** Returns posts filtered by a category. */
+export async function getPostsByCategory(category: string): Promise<Post[]> {
+  const response = await queryDataSource({ page_size: 100 });
+
+  const allPosts = await Promise.all(
+    (response.results as PageObjectResponse[]).map(pageToPost)
+  );
+
+  return sortPosts(
+    allPosts.filter(
+      (post) =>
+        post.status === "Published" &&
+        post.categories.some((c) => c.toLowerCase() === category.toLowerCase())
+    )
+  );
+}
+
 /** Returns all unique tags from published posts. */
 export async function getAllTags(): Promise<string[]> {
   const posts = await getPosts();
   const set = new Set(posts.flatMap((p) => p.tags));
+  return Array.from(set).sort();
+}
+
+/** Returns all unique categories from published posts. */
+export async function getAllCategories(): Promise<string[]> {
+  const posts = await getPosts();
+  const set = new Set(posts.flatMap((p) => p.categories));
   return Array.from(set).sort();
 }

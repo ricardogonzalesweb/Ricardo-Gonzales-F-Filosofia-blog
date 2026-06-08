@@ -9,6 +9,7 @@ export const GET: APIRoute = async () => {
     title: post.title,
     excerpt: post.excerpt ?? "",
     tags: post.tags,
+    categories: post.categories,
     author: post.author,
     date: post.publishedAt
       ? formatNotionDate(post.publishedAt, "pt-BR", {
