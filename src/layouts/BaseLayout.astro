@@ -1368,34 +1368,42 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "");
 
       let allPosts: PostEntry[] = [];
       let activeIndex = -1;
+      let isLoading = false;
+
+      function normalizeStr(str: string): string {
+        return str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+      }
 
       async function loadPosts() {
-        if (allPosts.length > 0) return;
+        if (allPosts.length > 0 || isLoading) return;
+        isLoading = true;
+        
+        // Show loading state if search input already has text
+        if (searchInput && searchInput.value.trim()) {
+          renderResults(searchInput.value);
+        }
+
         try {
-          const res = await fetch("/blog");
-          const html = await res.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, "text/html");
-          // PostCard items — class is "card" on <article>
-          const cards = doc.querySelectorAll("article.card");
-          cards.forEach((card) => {
-            const titleEl = card.querySelector(".title a");
-            const linkEl = card.querySelector("a");
-            const timeEl = card.querySelector("time");
-            const tagEls = card.querySelectorAll(".tag");
-            const initial = card.querySelector(".cover-initial");
-            if (titleEl && linkEl) {
-              allPosts.push({
-                title: titleEl.textContent?.trim() ?? "",
-                slug: linkEl.getAttribute("href") ?? "/blog",
-                tags: Array.from(tagEls).map((t) => t.textContent?.trim() ?? ""),
-                date: timeEl?.textContent?.trim() ?? "",
-                emoji: initial?.textContent?.trim() ?? "📄",
-              });
-            }
-          });
+          const res = await fetch("/api/search.json");
+          const data = await res.json();
+          allPosts = data.map((item: any) => ({
+            title: item.title,
+            slug: item.slug,
+            tags: item.tags || [],
+            date: item.date || "",
+            emoji: item.initial || "📄",
+          }));
         } catch (e) {
           console.warn("Não foi possível carregar posts para busca.", e);
+        } finally {
+          isLoading = false;
+          // Refresh results if user has typed something
+          if (searchInput && searchInput.value.trim()) {
+            renderResults(searchInput.value);
+          }
         }
       }
 
@@ -1421,11 +1429,20 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "");
           return;
         }
 
-        const lower = query.toLowerCase();
+        if (isLoading && allPosts.length === 0) {
+          searchResults.innerHTML = `
+            <div class="search-empty">
+              <div class="search-empty-icon">⏳</div>
+              <p>Buscando artigos...</p>
+            </div>`;
+          return;
+        }
+
+        const normalizedQuery = normalizeStr(query);
         const filtered = allPosts.filter(
           (p) =>
-            p.title.toLowerCase().includes(lower) ||
-            p.tags.some((t) => t.toLowerCase().includes(lower))
+            normalizeStr(p.title).includes(normalizedQuery) ||
+            p.tags.some((t) => normalizeStr(t).includes(normalizedQuery))
         );
 
         if (filtered.length === 0) {
