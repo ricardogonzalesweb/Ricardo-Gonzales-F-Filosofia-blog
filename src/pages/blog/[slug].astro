@@ -63,9 +63,7 @@ const latestPosts = (await getPosts())
 
 // Schema JSON-LD para melhor indexação nos buscadores
 const siteUrl = (Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br").toString().replace(/\/$/, "");
-const canonicalUrl = Astro.request?.url
-  ? new URL(Astro.request.url, siteUrl).toString()
-  : siteUrl;
+const canonicalUrl = `${siteUrl}${Astro.url.pathname === "/" ? "" : Astro.url.pathname}`;
 const articleImage = post.coverImage
   ? post.coverImage.startsWith("http")
     ? post.coverImage

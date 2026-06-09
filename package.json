@@ -17,7 +17,6 @@
     "@microsoft/clarity": "^1.0.2",
     "@notionhq/client": "^5.22.0",
     "astro": "^6.3.7",
-    "astro-seo": "^1.1.0",
-    "astro-sitemap": "^1.0.0"
+    "astro-seo": "^1.1.0"
   }
 }

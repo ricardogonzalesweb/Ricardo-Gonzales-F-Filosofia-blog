@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import sitemap, { EnumChangefreq } from 'astro-sitemap';
 import partytown from '@astrojs/partytown';
 import vercel from '@astrojs/vercel';
 
@@ -24,14 +23,9 @@ export default defineConfig({
     format: 'directory',
   },
 
-  // Integração do sitemap dinâmico
+  // Sitemap agora é gerado dinamicamente em src/pages/sitemap.xml.ts
+  // (astro-sitemap não funciona com output: 'server')
   integrations: [
-    sitemap({
-      // Incluir todas as rotas estáticas
-      changefreq: EnumChangefreq.WEEKLY,
-      priority: 0.7,
-      lastmod: new Date(),
-    }),
     partytown({
       config: {
         forward: ['dataLayer.push'],

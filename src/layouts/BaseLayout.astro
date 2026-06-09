@@ -22,10 +22,8 @@ const siteTitle = title.includes("Ricardo Gonzales")
   ? title
   : `${title} | ${siteName}`;
 
-const siteUrl = Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br";
-const canonicalUrl = Astro.request?.url
-  ? new URL(Astro.request.url, siteUrl).toString()
-  : siteUrl;
+const siteUrl = (Astro.site ?? import.meta.env.SITE ?? "https://ricardogonzalesoficial.com.br").toString().replace(/\/$/, "");
+const canonicalUrl = `${siteUrl}${Astro.url.pathname === "/" ? "" : Astro.url.pathname}`;
 const fullImage = ogImage
   ? ogImage.startsWith("http")
     ? ogImage
@@ -69,6 +67,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, "");
         card: "summary_large_image",
       }}
     />
+    <meta name="robots" content="index, follow" />
     {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
