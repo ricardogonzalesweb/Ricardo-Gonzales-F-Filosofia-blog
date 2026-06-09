@@ -116,6 +116,12 @@ const schemaArticle = {
           <span class="post-author">{post.author}</span>
           <span class="meta-separator">•</span>
           <time datetime={post.publishedAt}>{date}</time>
+          {post.readingTime && (
+            <>
+              <span class="meta-separator">•</span>
+              <span class="post-reading-time">{post.readingTime}</span>
+            </>
+          )}
         </div>
       </header>
 

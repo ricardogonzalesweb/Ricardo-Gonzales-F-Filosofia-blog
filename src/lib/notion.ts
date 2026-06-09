@@ -74,6 +74,7 @@ export interface Post {
   categories: string[];
   author: string;
   status: "Published" | "Draft";
+  readingTime: string | null;
 }
 
 export interface PostWithBlocks extends Post {
@@ -370,6 +371,39 @@ function getAuthor(props: Record<string, any>, page: PageObjectResponse): string
   );
 }
 
+function getReadingTime(props: Record<string, any>): string | null {
+  const propName = Object.keys(props).find(
+    (key) => key.toLowerCase() === "tempo de leitura" || key.toLowerCase() === "reading time"
+  );
+  if (!propName) return null;
+
+  const prop = props[propName];
+  if (!prop) return null;
+
+  let value: string | null = null;
+
+  if (prop.type === "formula") {
+    const formulaVal = prop.formula;
+    if (formulaVal.type === "string") value = formulaVal.string || null;
+    if (formulaVal.type === "number") value = formulaVal.number?.toString() || null;
+  } else if (prop.type === "number") {
+    value = prop.number != null ? prop.number.toString() : null;
+  } else if (prop.type === "rich_text") {
+    value = richTextToPlain(prop.rich_text ?? []);
+  }
+
+  if (!value) return null;
+
+  value = value.trim();
+
+  // Se for apenas número, adiciona "min" para ficar esteticamente correto
+  if (/^\d+$/.test(value)) {
+    return `${value} min`;
+  }
+
+  return value;
+}
+
 async function pageToPost(page: PageObjectResponse): Promise<Post> {
   const props = page.properties as Record<string, any>;
 
@@ -382,8 +416,9 @@ async function pageToPost(page: PageObjectResponse): Promise<Post> {
   const author = getAuthor(props, page);
   const status = getStatus(props);
   const coverImage = await getCoverImage(page, props);
+  const readingTime = getReadingTime(props);
 
-  return { id: page.id, slug, title, excerpt, coverImage, publishedAt, tags, categories, author, status };
+  return { id: page.id, slug, title, excerpt, coverImage, publishedAt, tags, categories, author, status, readingTime };
 }
 
 let cachedDataSourceId: string | undefined;
