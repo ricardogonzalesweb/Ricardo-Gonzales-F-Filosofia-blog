@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PostCard from "../../components/PostCard.astro";
+import TagDropdown from "../../components/TagDropdown.astro";
 import { getPosts, getAllTags } from "../../lib/notion";
 
 const posts = await getPosts();
@@ -15,12 +16,7 @@ const tags = await getAllTags();
     </header>
 
     {tags.length > 0 && (
-      <div class="tag-filter">
-        <a href="/blog" class="tag-btn active">Todos</a>
-        {tags.map((tag) => (
-          <a href={`/blog/tag/${tag.toLowerCase()}`} class="tag-btn">{tag}</a>
-        ))}
-      </div>
+      <TagDropdown tags={tags} />
     )}
 
     {posts.length > 0 ? (
@@ -38,9 +34,7 @@ const tags = await getAllTags();
   .page-header { padding: 4rem 0 2rem; }
   .page-title { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.4rem; }
   .page-sub { color: var(--color-muted); margin: 0; }
-  .tag-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.4rem; }
-  .tag-btn { font-size: 0.82rem; font-weight: 600; padding: 0.35em 0.9em; border-radius: 99px; border: 1px solid var(--color-border); text-decoration: none; color: var(--color-muted); transition: all 0.15s; }
-  .tag-btn:hover, .tag-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
   .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.6rem; padding-bottom: 4rem; }
   .empty { color: var(--color-muted); padding: 4rem 0; text-align: center; }
 </style>
+
